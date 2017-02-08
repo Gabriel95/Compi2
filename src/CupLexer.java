@@ -29,7 +29,7 @@ public class CupLexer {
                     }
                     break;
                 case 1:
-                    if(Character.isAlphabetic(currentChar) || Character.isDigit(currentChar) || currentChar == '_')
+                    if(Character.isLetterOrDigit(currentChar) || currentChar == '_')
                     {
                         lexeme += currentChar;
                         currentChar = getCurrentSymbol();
