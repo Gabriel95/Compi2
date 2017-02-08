@@ -1,3 +1,8 @@
+package Lexer;
+import Tokens.Token;
+import Tokens.TokenDictionary;
+import Tokens.TokenType;
+
 public class CupLexer {
     private String CodeContent;
     private int CurrentPointer;
@@ -27,7 +32,7 @@ public class CupLexer {
         }
         lexeme = lexeme.substring(0,lexeme.length()-2);
         isJava = false;
-        return new Token(lexeme,TokenType.JAVACODE);
+        return new Token(lexeme, TokenType.JAVACODE);
 
     }
 
@@ -60,7 +65,7 @@ public class CupLexer {
                     }
                     else if(currentChar == '\0')
                     {
-                        return new Token(lexeme,TokenType.EOF);
+                        return new Token(lexeme, TokenType.EOF);
                     }
                     else if(currentChar == '/'){
                         increasePointer();
@@ -107,7 +112,7 @@ public class CupLexer {
                             {
                                 lexeme += currentChar;
                                 increasePointer();
-                                return new Token(lexeme,TokenType.PRODUCTION);
+                                return new Token(lexeme, TokenType.PRODUCTION);
                             }
                             else
                             {
@@ -116,7 +121,7 @@ public class CupLexer {
                         }
                         else
                         {
-                            return new Token(lexeme,TokenType.COLON);
+                            return new Token(lexeme, TokenType.COLON);
                         }
                     }
 
@@ -133,12 +138,12 @@ public class CupLexer {
                         }
                         else
                         {
-                            return new Token(lexeme,TokenType.OPEN_BRACE);
+                            return new Token(lexeme, TokenType.OPEN_BRACE);
                         }
                     }
                     lexeme += currentChar;
                     increasePointer();
-                    return new Token (lexeme, dictionary.SymbolDictionary.get(lexeme));
+                    return new Token(lexeme, dictionary.SymbolDictionary.get(lexeme));
                 case 3:
                     String acumm = "";
                     while(!acumm.endsWith("*/") && currentChar != '\0'){
