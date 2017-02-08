@@ -19,6 +19,7 @@ public class CupLexer {
         {
             switch (state)
             {
+                //initial node
                 case 0:
                     if(Character.isAlphabetic(currentChar))
                     {
@@ -27,7 +28,12 @@ public class CupLexer {
                         currentChar = getCurrentSymbol();
                         increasePointer();
                     }
+                    if(TokenDictionary.SymbolDictionary.containsKey(""+currentChar));
+                    {
+                        state = 2;
+                    }
                     break;
+                //ID
                 case 1:
                     if(Character.isLetterOrDigit(currentChar) || currentChar == '_')
                     {
@@ -40,9 +46,10 @@ public class CupLexer {
                     {
                         return new Token(lexeme,TokenType.ID);
                     }
+                //dot
                 case 2:
-                    System.out.println(currentChar);
-
+                    lexeme += currentChar;
+                    return new Token (lexeme,TokenType.ID);
             }
         }
 
