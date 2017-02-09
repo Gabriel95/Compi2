@@ -28,14 +28,12 @@ parser code {:
 :};
 
 
-
 terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN;
 terminal Integer   NUMBER, ID;
 terminal           SATAN;
 
 non terminal Object     expr_list, expr_part;
 non terminal Integer    expr, factor, term;
-
 
 
 

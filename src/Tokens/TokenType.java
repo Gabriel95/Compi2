@@ -19,9 +19,9 @@ public enum TokenType {
     RW_CODE,
     RW_TERMINAL,
     RW_NON,
-    RW_INTEGER,
-    RW_OBJECT,
-    RW_STRING,
+//    RW_INTEGER,
+//    RW_OBJECT,
+//    RW_STRING,
     RW_PRECEDENCE,
     RW_LEFT,
     RW_RIGHT,
@@ -31,5 +31,5 @@ public enum TokenType {
     RW_NONASSOC,
     RW_PACKAGE,
     RW_ACTION,
-    EOF, PRODUCTION, JAVACODE, ASTERISKS
+    EOF, PRODUCTION, JAVACODE, RW_START, ASTERISKS
 }

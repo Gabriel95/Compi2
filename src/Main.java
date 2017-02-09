@@ -1,4 +1,5 @@
 import Lexer.CupLexer;
+import ParserPK.Parser;
 import Tokens.Token;
 import Tokens.TokenType;
 
@@ -21,14 +22,20 @@ public class Main {
             System.out.print("error:" + e.getMessage());
         }
         CupLexer lexer = new CupLexer(cupFileContent);
-
-        Token t = lexer.getNextToken();
-        while(t.type != TokenType.EOF)
-        {
-            System.out.println(t.lexeme + " " + t.type);
-            t = lexer.getNextToken();
+//        Token t = lexer.getNextToken();
+//        while(t.type != TokenType.EOF){
+//            System.out.println(t.lexeme + " " + t.type);
+//            t = lexer.getNextToken();
+//        }
+        Parser parser = new Parser(lexer);
+        try {
+            parser.Parse();
+            System.out.println("SUCCESS!");
         }
-
+        catch (Exception e)
+        {
+            System.out.print(e.getMessage());
+        }
 
     }
 }

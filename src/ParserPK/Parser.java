@@ -18,7 +18,7 @@ public class Parser {
 
     public void Parse() throws Exception {
         Code();
-        if(currentToken.type != TokenType.EOF);
+        if(currentToken.type != TokenType.EOF)
             throw new ParserException("Expected End Of File");
     }
 
@@ -40,6 +40,124 @@ public class Parser {
         symbol_list();
         presedence_list();
         start_spec();
+        production_list();
+    }
+
+    private void production_list() throws Exception {
+        production();
+        production_list_prime();
+    }
+
+    private void production_list_prime() throws Exception {
+        if(currentToken.type == TokenType.ID){
+            production();
+            production_list_prime();
+        }
+        else
+        {
+            //Epsilon
+        }
+    }
+
+    private void production() throws Exception{
+        nt_id();
+        if(currentToken.type != TokenType.PRODUCTION)
+            throw new ParserException("Expected: ::=");
+        ConsumeToken();
+        rhs_list();
+        if(currentToken.type != TokenType.SEMICOLON)
+            throw new ParserException("Expected: SEMICOLON");
+        ConsumeToken();
+    }
+
+    private void rhs_list() throws Exception {
+        rhs();
+        if(currentToken.type == TokenType.PIPE)
+        {
+            ConsumeToken();
+            rhs_list();
+        }
+    }
+
+    private void rhs() throws Exception {
+        prod_part_list();
+        //TODO %
+    }
+
+    private void prod_part_list() throws Exception {
+        if(currentToken.type == TokenType.ID || currentToken.type == TokenType.JAVACODE){
+            prod_part();
+            prod_part_list();
+        }
+        else
+        {
+
+        }
+    }
+
+    private void prod_part() throws Exception {
+        if(currentToken.type == TokenType.ID)
+        {
+            symbol_id();
+            opt_label();
+        }
+        else if(currentToken.type == TokenType.JAVACODE)
+        {
+            ConsumeToken();
+        }
+
+    }
+
+    private void opt_label() throws Exception {
+        if(currentToken.type == TokenType.COLON)
+        {
+            ConsumeToken();
+            label_id();
+        }
+        else
+        {
+
+        }
+    }
+
+    private void label_id() throws Exception {
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+    }
+
+    private void symbol_id() throws Exception {
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+    }
+
+    private void start_spec() throws Exception {
+        if(currentToken.type == TokenType.RW_START)
+        {
+            ConsumeToken();
+            if(currentToken.type != TokenType.RW_WITH)
+                throw new ParserException("Expected: with");
+            ConsumeToken();
+            nt_id();
+            if(currentToken.type != TokenType.SEMICOLON)
+                throw new ParserException("Expected: SEMICOLON");
+            ConsumeToken();
+        }
+        else
+        {
+
+        }
+    }
+
+    private void nt_id() throws Exception {
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+    }
+
+    private void presedence_list() {
+        //TODO
     }
 
     private void symbol_list() throws Exception{
@@ -54,15 +172,75 @@ public class Parser {
         if(currentToken.type == TokenType.RW_TERMINAL)
         {
             ConsumeToken();
-            type_id();
-            declares_term();
+            term_declaration();
         }
         else if(currentToken.type == TokenType.RW_NON){
             ConsumeToken();
             if(currentToken.type != TokenType.RW_TERMINAL)
                 throw new ParserException("Expected: key word Terminal");
-            type_id();
+            ConsumeToken();
+            non_term_declaration();
+        }
+    }
+
+    private void non_term_declaration() throws Exception {
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+        if(currentToken.type == TokenType.SEMICOLON)
+            ConsumeToken();
+        else
+            non_term_declaration_prime();
+    }
+
+    private void non_term_declaration_prime() throws Exception {
+        if(currentToken.type == TokenType.DOT)
+        {
+            ConsumeToken();
+            multiPart_Id();
             declares_non_term();
+        }
+        else if (currentToken.type == TokenType.COMMA)
+        {
+            ConsumeToken();
+            declares_non_term();
+        }
+        else if(currentToken.type == TokenType.ID){
+            declares_non_term();
+        }
+        else
+        {
+
+        }
+    }
+
+    private void term_declaration() throws Exception {
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+        if(currentToken.type == TokenType.SEMICOLON)
+            ConsumeToken();
+        else term_declaration_prime();
+    }
+
+    private void term_declaration_prime() throws Exception {
+        if(currentToken.type == TokenType.DOT)
+        {
+            ConsumeToken();
+            multiPart_Id();
+            declares_term();
+        }
+        else if (currentToken.type == TokenType.COMMA)
+        {
+            ConsumeToken();
+            declares_term();
+        }
+        else if(currentToken.type == TokenType.ID){
+            declares_term();
+        }
+        else
+        {
+
         }
     }
 
@@ -109,7 +287,7 @@ public class Parser {
     }
 
     private void type_id() throws Exception {
-        multiPart_Id();
+
     }
 
     private void package_spec() throws Exception {
@@ -132,9 +310,21 @@ public class Parser {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
         ConsumeToken();
-        if(currentToken.type == TokenType.DOT){
+        multiPart_Id_prime();
+    }
+
+    private void multiPart_Id_prime() throws Exception {
+        if(currentToken.type == TokenType.DOT)
+        {
             ConsumeToken();
-            multiPart_Id();
+            if(currentToken.type != TokenType.ID)
+                throw new ParserException("Expected: ID");
+            ConsumeToken();
+            multiPart_Id_prime();
+        }
+        else
+        {
+
         }
     }
 
@@ -153,15 +343,33 @@ public class Parser {
     }
 
     private void import_id() throws Exception {
-        multiPart_Id();
-        if(currentToken.type == TokenType.DOT)
+        if(currentToken.type != TokenType.ID)
+            throw new ParserException("Expected: ID");
+        ConsumeToken();
+        import_id_prime();
+    }
+
+    private void import_id_prime() throws Exception {
+        if(currentToken.type == TokenType.DOT){
+            ConsumeToken();
+            id_or_star();
+        }
+        else{
+            //Epsilon
+        }
+    }
+
+    private void id_or_star() throws Exception {
+        if(currentToken.type == TokenType.ID)
         {
             ConsumeToken();
-            if(currentToken.type != TokenType.ASTERISKS)
-                throw new ParserException("Expected: *");
+            import_id_prime();
+        }else if(currentToken.type == TokenType.ASTERISKS){
             ConsumeToken();
+        }else
+        {
+            throw new ParserException("Expected * or ID");
         }
-
     }
 
     private void code_parts() throws Exception {
