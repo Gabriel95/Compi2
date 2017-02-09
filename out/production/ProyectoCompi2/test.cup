@@ -27,7 +27,18 @@ parser code {:
     }
 :};
 
+action code {:
+     System.out.print("action");
+:};
 
+scan with code {:
+     System.out.print("scan");
+:}
+
+init with code {:
+     System.out.print("init");
+:};
+/*
 terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN;
 terminal Integer   NUMBER, ID;
 terminal           SATAN;
@@ -77,3 +88,4 @@ non terminal Integer    expr, factor, term;
                  ID:i
                  {: RESULT = 0; :}
                  ;
+                 */

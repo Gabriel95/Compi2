@@ -37,7 +37,7 @@ non terminal Integer    expr, factor, term;
 
 
 
-
+/*
    expr_list ::= expr_list expr_part
                  |expr_part;
 
@@ -77,3 +77,4 @@ non terminal Integer    expr, factor, term;
                  ID:i
                  {: RESULT = 0; :}
                  ;
+*/

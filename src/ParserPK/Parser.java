@@ -3,6 +3,9 @@ import Lexer.CupLexer;
 import Tokens.Token;
 import Tokens.TokenType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by jpaz on 2/8/17.
  */
@@ -16,31 +19,35 @@ public class Parser {
         currentToken = this.lexer.getNextToken();
     }
 
-    public void Parse() throws Exception {
-        Code();
+    public StatementNode Parse() throws Exception
+    {
+        StatementNode node = Code();
         if(currentToken.type != TokenType.EOF)
             throw new ParserException("Expected End Of File");
+        return node;
     }
 
-    private void Code() throws Exception {
+    private StatementNode Code() throws Exception {
         if(currentToken.type == TokenType.RW_PACKAGE || currentToken.type == TokenType.RW_IMPORT || currentToken.type == TokenType.RW_ACTION ||
                 currentToken.type == TokenType.RW_PARSER || currentToken.type == TokenType.RW_INIT || currentToken.type == TokenType.RW_SCAN
                 || currentToken.type == TokenType.RW_TERMINAL || currentToken.type == TokenType.RW_NON)
         {
-            java_cup_spec();
+            return java_cup_spec();
         }else{
-
+            return new RootNode();
         }
     }
 
-    private void java_cup_spec() throws Exception {
-        package_spec();
-        import_list();
-        code_parts();
-        symbol_list();
-        presedence_list();
-        start_spec();
-        production_list();
+    private RootNode java_cup_spec() throws Exception {
+        RootNode toReturn = new RootNode();
+        toReturn.packageNode = package_spec();
+        toReturn.importList = import_list();
+        toReturn.codeParts = code_parts();
+        toReturn.symbolList = symbol_list();
+//        presedence_list();
+//        start_spec();
+//        production_list();
+        return toReturn;
     }
 
     private void production_list() throws Exception {
@@ -160,26 +167,34 @@ public class Parser {
         //TODO
     }
 
-    private void symbol_list() throws Exception{
-        symbol();
+    private List<SymbolNode> symbol_list() throws Exception{
+        SymbolNode symbolNode = symbol();
         if(currentToken.type == TokenType.RW_TERMINAL || currentToken.type == TokenType.RW_NON)
         {
-            symbol_list();
+            List<SymbolNode> toReturn = symbol_list();
+            toReturn.add(0,symbolNode);
+            return toReturn;
         }
+        List<SymbolNode> toReturn = new ArrayList<>();
+        toReturn.add(symbolNode);
+        return toReturn;
     }
 
-    private void symbol() throws Exception{
+    private SymbolNode symbol() throws Exception{
         if(currentToken.type == TokenType.RW_TERMINAL)
         {
             ConsumeToken();
-            term_declaration();
+            TerminalSymbolNode terminalSymbolNode = term_declaration();
+            return terminalSymbolNode;
         }
-        else if(currentToken.type == TokenType.RW_NON){
+        else //if(currentToken.type == TokenType.RW_NON)
+        {
             ConsumeToken();
             if(currentToken.type != TokenType.RW_TERMINAL)
                 throw new ParserException("Expected: key word Terminal");
             ConsumeToken();
-            non_term_declaration();
+            symbolNode.declarationNode = non_term_declaration();
+            return symbolNode;
         }
     }
 
@@ -214,21 +229,42 @@ public class Parser {
         }
     }
 
-    private void term_declaration() throws Exception {
+    private TerminalSymbolNode term_declaration() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        String name = currentToken.lexeme;
         ConsumeToken();
+
         if(currentToken.type == TokenType.SEMICOLON)
+        {
+            TerminalSymbolNode terminalSymbolNode = new TerminalSymbolNode();
             ConsumeToken();
-        else term_declaration_prime();
+            terminalSymbolNode.className = null;
+            TerminalIdNode declarationNode = new TerminalIdNode(); /*extends IdNode*/
+            declarationNode.Name = name;
+            List<TerminalIdNode> listDeclarationNode = new ArrayList<>();
+            listDeclarationNode.add(declarationNode);
+            terminalSymbolNode.declarationList = listDeclarationNode;
+            return terminalSymbolNode;
+        }
+        else
+        {
+            term_declaration_prime(name);
+        }
     }
 
-    private void term_declaration_prime() throws Exception {
+    private TerminalSymbolNode term_declaration_prime(String name) throws Exception {
         if(currentToken.type == TokenType.DOT)
         {
             ConsumeToken();
-            multiPart_Id();
-            declares_term();
+            TerminalSymbolNode terminalSymbolNode = new TerminalSymbolNode();
+            DeclarationTypeNode declarationTypeNode = new DeclarationTypeNode();
+            declarationTypeNode.Name = name;
+            DotAccessorNode dotAccessorNode = new DotAccessorNode();
+            dotAccessorNode.IdNode = multiPart_Id();
+            declarationTypeNode.accessor = dotAccessorNode;
+            terminalSymbolNode.className = declarationTypeNode;
+            terminalSymbolNode.declarationList = declares_term();
         }
         else if (currentToken.type == TokenType.COMMA)
         {
@@ -265,138 +301,174 @@ public class Parser {
         ConsumeToken();
     }
 
-    private void declares_term() throws Exception {
-        term_name_list();
+    private List<TerminalIdNode> declares_term() throws Exception {
+        List<TerminalIdNode> terminalIdNodeList = term_name_list();
         if(currentToken.type != TokenType.SEMICOLON)
             throw new ParserException("Expected: Semicolon");
         ConsumeToken();
+        return terminalIdNodeList;
     }
 
-    private void term_name_list() throws Exception {
-        new_term_id();
+    private List<TerminalIdNode> term_name_list() throws Exception {
+        TerminalIdNode terminalIdNode = new_term_id();
+        List<TerminalIdNode> terminalIdNodeList = new ArrayList<>();
         if(currentToken.type == TokenType.COMMA){
             ConsumeToken();
-            term_name_list();
+            terminalIdNodeList = term_name_list();
+            terminalIdNodeList.add(0,terminalIdNode);
+            return terminalIdNodeList;
         }
+        terminalIdNodeList.add(terminalIdNode);
+        return terminalIdNodeList;
     }
 
-    private void new_term_id() throws Exception {
+    private TerminalIdNode new_term_id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        TerminalIdNode terminalIdNode = new TerminalIdNode();
+        terminalIdNode.Name = currentToken.lexeme;
         ConsumeToken();
+        return terminalIdNode;
     }
 
     private void type_id() throws Exception {
 
     }
 
-    private void package_spec() throws Exception {
+    private PackageNode package_spec() throws Exception {
         if(currentToken.type == TokenType.RW_PACKAGE)
         {
             ConsumeToken();
-            multiPart_Id();
+            IdNode idNode = multiPart_Id();
             if(currentToken.type != TokenType.SEMICOLON)
                 throw new ParserException("Expected: Semicolon");
             ConsumeToken();
-
+            PackageNode packageNode = new PackageNode();
+            packageNode.IdNode = idNode;
+            return packageNode;
         }
         else
         {
-
+            return new PackageNode();
         }
     }
 
-    private void multiPart_Id() throws Exception {
+    private IdNode multiPart_Id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        NormalIdNode idNode = new NormalIdNode();
+        idNode.Name = currentToken.lexeme;
         ConsumeToken();
-        multiPart_Id_prime();
+        idNode.accessor = multiPart_Id_prime();
+        return idNode;
     }
 
-    private void multiPart_Id_prime() throws Exception {
+    private AccessorNode multiPart_Id_prime() throws Exception {
         if(currentToken.type == TokenType.DOT)
         {
             ConsumeToken();
+            DotAccessorNode dotAccessorNode = new DotAccessorNode();
             if(currentToken.type != TokenType.ID)
                 throw new ParserException("Expected: ID");
+            NormalIdNode idNode = new NormalIdNode();
+            idNode.Name = currentToken.lexeme;
             ConsumeToken();
-            multiPart_Id_prime();
+            idNode.accessor = multiPart_Id_prime();
+            dotAccessorNode.IdNode = idNode;
+            return dotAccessorNode;
         }
         else
         {
-
+            return null;
         }
     }
 
-    private void import_list() throws Exception {
+    private List<ImportIdNode> import_list() throws Exception {
         if(currentToken.type == TokenType.RW_IMPORT){
             ConsumeToken();
-            import_id();
+            ImportIdNode importIdNode = import_id();
             if(currentToken.type != TokenType.SEMICOLON)
                 throw new ParserException("Expected: ;");
             ConsumeToken();
+            List<ImportIdNode> listToReturn = import_list();
+            listToReturn.add(0,importIdNode);
+            return listToReturn;
         }
         else
         {
-
+            return new ArrayList<>();
         }
     }
 
-    private void import_id() throws Exception {
+    private ImportIdNode import_id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        ImportIdNode importIdNode = new ImportIdNode();
+        importIdNode.Name = currentToken.lexeme;
         ConsumeToken();
-        import_id_prime();
+        importIdNode.accessor = import_id_prime();
+        return importIdNode;
     }
 
-    private void import_id_prime() throws Exception {
+    private AccessorNode import_id_prime() throws Exception {
         if(currentToken.type == TokenType.DOT){
             ConsumeToken();
-            id_or_star();
+            DotAccessorNode dotAccessorNode = new DotAccessorNode();
+            dotAccessorNode.IdNode = id_or_star();
+            return dotAccessorNode;
         }
         else{
-            //Epsilon
+            return null;
         }
     }
 
-    private void id_or_star() throws Exception {
+    private IdNode id_or_star() throws Exception {
         if(currentToken.type == TokenType.ID)
         {
+            NormalIdNode normalIdNode = new NormalIdNode();
+            normalIdNode.Name = currentToken.lexeme;
             ConsumeToken();
-            import_id_prime();
-        }else if(currentToken.type == TokenType.ASTERISKS){
+            normalIdNode.accessor = import_id_prime();
+            return normalIdNode;
+        }
+        else if(currentToken.type == TokenType.ASTERISKS)
+        {
             ConsumeToken();
-        }else
+            return new StarId();
+        }
+        else
         {
             throw new ParserException("Expected * or ID");
         }
     }
 
-    private void code_parts() throws Exception {
+    private List<CodePartNode> code_parts() throws Exception {
         if( currentToken.type == TokenType.RW_ACTION || currentToken.type == TokenType.RW_PARSER
                 || currentToken.type == TokenType.RW_INIT || currentToken.type == TokenType.RW_SCAN)
         {
-            code_part();
-            code_parts();
+            CodePartNode codePartNode = code_part();
+            List<CodePartNode> listToReturn = code_parts();
+            listToReturn.add(0,codePartNode);
+            return listToReturn;
         }
         else
         {
-
+            return new ArrayList<>();
         }
     }
 
-    private void code_part() throws Exception {
+    private CodePartNode code_part() throws Exception {
         if(currentToken.type == TokenType.RW_ACTION)
-            action_code_part();
+            return action_code_part();
         else if(currentToken.type == TokenType.RW_PARSER)
-            parser_code_part();
+            return parser_code_part();
         else if(currentToken.type == TokenType.RW_INIT)
-            init_code();
-        else if(currentToken.type == TokenType.RW_SCAN)
-            scan_code();
+            return init_code();
+        else //(currentToken.type == TokenType.RW_SCAN)
+            return scan_code();
     }
 
-    private void scan_code() throws Exception {
+    private ScanCodeNode scan_code() throws Exception {
         if(currentToken.type != TokenType.RW_SCAN)
             throw new ParserException("Expected: scan");
         ConsumeToken();
@@ -408,11 +480,16 @@ public class Parser {
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
             throw new ParserException("Expected: JavaCode");
+        JavaCodeNode javaCodeNode = new JavaCodeNode();
+        javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
         opt_semi();
+        ScanCodeNode scanCodeNode = new ScanCodeNode();
+        scanCodeNode.javaCodeNode = javaCodeNode;
+        return scanCodeNode;
     }
 
-    private void init_code() throws Exception {
+    private InitCodeNode init_code() throws Exception {
         if(currentToken.type != TokenType.RW_INIT)
             throw new ParserException("Expected: parser");
         ConsumeToken();
@@ -424,11 +501,16 @@ public class Parser {
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
             throw new ParserException("Expected: JavaCode");
+        JavaCodeNode javaCodeNode = new JavaCodeNode();
+        javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
         opt_semi();
+        InitCodeNode initCodeNode = new InitCodeNode();
+        initCodeNode.javaCodeNode = javaCodeNode;
+        return initCodeNode;
     }
 
-    private void parser_code_part() throws Exception {
+    private ParserCodePartNode parser_code_part() throws Exception {
         if(currentToken.type != TokenType.RW_PARSER)
             throw new ParserException("Expected: parser");
         ConsumeToken();
@@ -437,11 +519,16 @@ public class Parser {
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
             throw new ParserException("Expected: JavaCode");
+        JavaCodeNode javaCodeNode = new JavaCodeNode();
+        javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
         opt_semi();
+        ParserCodePartNode parserCodePartNode = new ParserCodePartNode();
+        parserCodePartNode.javaCodeNode = javaCodeNode;
+        return parserCodePartNode;
     }
 
-    private void action_code_part() throws Exception {
+    private ActionCodePartNode action_code_part() throws Exception {
         if(currentToken.type != TokenType.RW_ACTION)
             throw new ParserException("Expected: action");
         ConsumeToken();
@@ -450,9 +537,13 @@ public class Parser {
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
             throw new ParserException("Expected: JavaCode");
+        JavaCodeNode javaCodeNode = new JavaCodeNode();
+        javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
         opt_semi();
-
+        ActionCodePartNode actionCodePartNode = new ActionCodePartNode();
+        actionCodePartNode.javaCodeNode = javaCodeNode;
+        return actionCodePartNode;
     }
 
     private void opt_semi() throws Exception {
