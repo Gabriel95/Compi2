@@ -9,4 +9,6 @@ public class RootNode extends StatementNode{
     public PackageNode packageNode;
     public List<ImportIdNode> importList;
     public List<CodePartNode> codeParts;
+    public List<SymbolNode> symbolList;
+    public List<ProductionNode> productionList;
 }

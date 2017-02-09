@@ -46,97 +46,127 @@ public class Parser {
         toReturn.symbolList = symbol_list();
 //        presedence_list();
 //        start_spec();
-//        production_list();
+        toReturn.productionList = production_list();
         return toReturn;
     }
 
-    private void production_list() throws Exception {
-        production();
-        production_list_prime();
+    private List<ProductionNode> production_list() throws Exception {
+        ProductionNode product = production();
+        List<ProductionNode> production_list = production_list_prime();
+        production_list.add(0,product);
+        return production_list;
     }
 
-    private void production_list_prime() throws Exception {
+    private List<ProductionNode> production_list_prime() throws Exception {
         if(currentToken.type == TokenType.ID){
-            production();
-            production_list_prime();
+            ProductionNode product = production();
+            List<ProductionNode> production_list = production_list_prime();
+            production_list.add(0,product);
+            return production_list;
         }
         else
         {
-            //Epsilon
+            return new ArrayList<>();
         }
     }
 
-    private void production() throws Exception{
-        nt_id();
+    private ProductionNode production() throws Exception{
+        NonTerminalIdNode nonTerminalIdNode = nt_id();
         if(currentToken.type != TokenType.PRODUCTION)
             throw new ParserException("Expected: ::=");
         ConsumeToken();
-        rhs_list();
+        List<RhsNode> rhsTokenList = rhs_list();
         if(currentToken.type != TokenType.SEMICOLON)
             throw new ParserException("Expected: SEMICOLON");
         ConsumeToken();
+        ProductionNode product = new ProductionNode();
+        product.RhsTokenList = rhsTokenList;
+        product.ntID = nonTerminalIdNode;
+        return product;
     }
 
-    private void rhs_list() throws Exception {
-        rhs();
+    private List<RhsNode> rhs_list() throws Exception {
+        RhsNode rhsNode = rhs();
+        List<RhsNode> rhsNodeList = new ArrayList<>();
         if(currentToken.type == TokenType.PIPE)
         {
             ConsumeToken();
-            rhs_list();
+            rhsNodeList = rhs_list();
         }
+        rhsNodeList.add(0,rhsNode);
+        return rhsNodeList;
     }
 
-    private void rhs() throws Exception {
-        prod_part_list();
+    private RhsNode rhs() throws Exception {
+        RhsNode rhsNode = new RhsNode();
+        rhsNode.prodPartList = prod_part_list();
+        return rhsNode;
         //TODO %
     }
 
-    private void prod_part_list() throws Exception {
+    private List<ProdPartNode> prod_part_list() throws Exception {
         if(currentToken.type == TokenType.ID || currentToken.type == TokenType.JAVACODE){
-            prod_part();
-            prod_part_list();
+            ProdPartNode prodPartNode = prod_part();
+            List<ProdPartNode> prodPartNodeList = prod_part_list();
+            prodPartNodeList.add(0,prodPartNode);
+            return prodPartNodeList;
         }
         else
         {
-
+            return new ArrayList<>();
         }
     }
 
-    private void prod_part() throws Exception {
+    private ProdPartNode prod_part() throws Exception {
+
+        ProdPartNode prodPartNode = new ProdPartNode();
         if(currentToken.type == TokenType.ID)
         {
-            symbol_id();
-            opt_label();
+            SymbolIdNode symbolId = symbol_id();
+            symbolId.label = opt_label();
+            prodPartNode.symbolIdNode = symbolId;
         }
         else if(currentToken.type == TokenType.JAVACODE)
         {
+            JavaCodeNode javaCodeNode = new JavaCodeNode();
+            javaCodeNode.Code = currentToken.lexeme;
+            prodPartNode.JavaCodeNode = javaCodeNode;
             ConsumeToken();
         }
-
+        else{
+            throw new ParserException("Expected ID or JavaCode");
+        }
+        return prodPartNode;
     }
 
-    private void opt_label() throws Exception {
+    private LabelIdNode opt_label() throws Exception {
         if(currentToken.type == TokenType.COLON)
         {
             ConsumeToken();
-            label_id();
+            return label_id();
         }
         else
         {
-
+            return null;
         }
     }
 
-    private void label_id() throws Exception {
+    private LabelIdNode label_id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        LabelIdNode labelIdNode = new LabelIdNode();
+        labelIdNode.Name = currentToken.lexeme;
         ConsumeToken();
+        return labelIdNode;
     }
 
-    private void symbol_id() throws Exception {
+    private SymbolIdNode symbol_id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        SymbolIdNode symbolIdNode = new SymbolIdNode();
+        symbolIdNode.Name = currentToken.lexeme;
         ConsumeToken();
+        return symbolIdNode;
     }
 
     private void start_spec() throws Exception {
@@ -157,10 +187,14 @@ public class Parser {
         }
     }
 
-    private void nt_id() throws Exception {
-        if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
-        ConsumeToken();
+    private NonTerminalIdNode nt_id() throws Exception {
+//        if(currentToken.type != TokenType.ID)
+//            throw new ParserException("Expected: ID");
+//        NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode();
+//        nonTerminalIdNode.Name = currentToken.lexeme;
+//        ConsumeToken();
+//        return nonTerminalIdNode;
+        return new_non_term_id();
     }
 
     private void presedence_list() {
@@ -184,8 +218,7 @@ public class Parser {
         if(currentToken.type == TokenType.RW_TERMINAL)
         {
             ConsumeToken();
-            TerminalSymbolNode terminalSymbolNode = term_declaration();
-            return terminalSymbolNode;
+            return term_declaration();
         }
         else //if(currentToken.type == TokenType.RW_NON)
         {
@@ -193,39 +226,68 @@ public class Parser {
             if(currentToken.type != TokenType.RW_TERMINAL)
                 throw new ParserException("Expected: key word Terminal");
             ConsumeToken();
-            symbolNode.declarationNode = non_term_declaration();
-            return symbolNode;
+            NonTerminalSymbolNode nonTerminalSymbolNode;
+            nonTerminalSymbolNode = non_term_declaration();
+            return nonTerminalSymbolNode;
         }
     }
 
-    private void non_term_declaration() throws Exception {
+    private NonTerminalSymbolNode non_term_declaration() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        String name = currentToken.lexeme;
         ConsumeToken();
         if(currentToken.type == TokenType.SEMICOLON)
+        {
+            NonTerminalSymbolNode nonTerminalSymbolNode = new NonTerminalSymbolNode();
             ConsumeToken();
+            nonTerminalSymbolNode.className = null;
+            NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode(); /*extends IdNode*/
+            nonTerminalIdNode.Name = name;
+            List<IdNode> listDeclarationNode = new ArrayList<>();
+            listDeclarationNode.add(nonTerminalIdNode);
+            nonTerminalSymbolNode.declarationList = listDeclarationNode;
+            return nonTerminalSymbolNode;
+        }
         else
-            non_term_declaration_prime();
+            return non_term_declaration_prime(name);
     }
 
-    private void non_term_declaration_prime() throws Exception {
+    private NonTerminalSymbolNode non_term_declaration_prime(String name) throws Exception {
+       NonTerminalSymbolNode nonTerminalSymbolNode = new NonTerminalSymbolNode();
         if(currentToken.type == TokenType.DOT)
         {
             ConsumeToken();
-            multiPart_Id();
-            declares_non_term();
+            DeclarationTypeNode declarationTypeNode = new DeclarationTypeNode();
+            declarationTypeNode.Name = name;
+            DotAccessorNode dotAccessorNode = new DotAccessorNode();
+            dotAccessorNode.IdNode = multiPart_Id();
+            declarationTypeNode.accessor = dotAccessorNode;
+            nonTerminalSymbolNode.className = declarationTypeNode;
+            nonTerminalSymbolNode.declarationList = declares_non_term();
+            return nonTerminalSymbolNode;
         }
         else if (currentToken.type == TokenType.COMMA)
         {
             ConsumeToken();
-            declares_non_term();
+            NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode();
+            nonTerminalIdNode.Name = name;
+            nonTerminalSymbolNode.className = null;
+            nonTerminalSymbolNode.declarationList = declares_non_term();
+            nonTerminalSymbolNode.declarationList.add(0,nonTerminalIdNode);
+            return nonTerminalSymbolNode;
         }
         else if(currentToken.type == TokenType.ID){
-            declares_non_term();
+            DeclarationTypeNode declarationTypeNode = new DeclarationTypeNode();
+            declarationTypeNode.Name = name;
+            nonTerminalSymbolNode.className = declarationTypeNode;
+            nonTerminalSymbolNode.declarationList = declares_non_term();
+            return nonTerminalSymbolNode;
         }
         else
         {
-
+            //TODO?
+            throw new ParserException("Expected \';\' , \'.\' , \',\' or ID");
         }
     }
 
@@ -242,22 +304,22 @@ public class Parser {
             terminalSymbolNode.className = null;
             TerminalIdNode declarationNode = new TerminalIdNode(); /*extends IdNode*/
             declarationNode.Name = name;
-            List<TerminalIdNode> listDeclarationNode = new ArrayList<>();
+            List<IdNode> listDeclarationNode = new ArrayList<>();
             listDeclarationNode.add(declarationNode);
             terminalSymbolNode.declarationList = listDeclarationNode;
             return terminalSymbolNode;
         }
         else
         {
-            term_declaration_prime(name);
+            return term_declaration_prime(name);
         }
     }
 
     private TerminalSymbolNode term_declaration_prime(String name) throws Exception {
+        TerminalSymbolNode terminalSymbolNode = new TerminalSymbolNode();
         if(currentToken.type == TokenType.DOT)
         {
             ConsumeToken();
-            TerminalSymbolNode terminalSymbolNode = new TerminalSymbolNode();
             DeclarationTypeNode declarationTypeNode = new DeclarationTypeNode();
             declarationTypeNode.Name = name;
             DotAccessorNode dotAccessorNode = new DotAccessorNode();
@@ -265,53 +327,73 @@ public class Parser {
             declarationTypeNode.accessor = dotAccessorNode;
             terminalSymbolNode.className = declarationTypeNode;
             terminalSymbolNode.declarationList = declares_term();
+            return terminalSymbolNode;
         }
         else if (currentToken.type == TokenType.COMMA)
         {
             ConsumeToken();
-            declares_term();
+            TerminalIdNode terminalIdNode = new TerminalIdNode();
+            terminalIdNode.Name = name;
+            terminalSymbolNode.className = null;
+            terminalSymbolNode.declarationList = declares_term();
+            terminalSymbolNode.declarationList.add(0,terminalIdNode);
+            return terminalSymbolNode;
         }
         else if(currentToken.type == TokenType.ID){
-            declares_term();
+            DeclarationTypeNode declarationTypeNode = new DeclarationTypeNode();
+            declarationTypeNode.Name = name;
+            terminalSymbolNode.className = declarationTypeNode;
+            terminalSymbolNode.declarationList = declares_term();
+            return terminalSymbolNode;
         }
         else
         {
-
+            //TODO?
+            throw new ParserException("Expected \';\' , \'.\' , \',\' or ID");
         }
     }
 
-    private void declares_non_term() throws Exception{
-        non_term_name_list();
+    private List<IdNode> declares_non_term() throws Exception{
+        List<IdNode> nonTerminalIdNodeList = non_term_name_list();
         if(currentToken.type != TokenType.SEMICOLON)
             throw new ParserException("Expected: Semicolon");
         ConsumeToken();
+        return nonTerminalIdNodeList;
     }
 
-    private void non_term_name_list() throws Exception{
-        new_non_term_id();
+    private List<IdNode> non_term_name_list() throws Exception{
+        NonTerminalIdNode nonTerminalIdNode = new_non_term_id();
+        List<IdNode> nonTerminalIdNodeList = new ArrayList<>();
         if(currentToken.type == TokenType.COMMA){
             ConsumeToken();
-            non_term_name_list();
+            nonTerminalIdNodeList = non_term_name_list();
+            nonTerminalIdNodeList.add(0,nonTerminalIdNode);
+            return nonTerminalIdNodeList;
         }
+        nonTerminalIdNodeList.add(nonTerminalIdNode);
+        return nonTerminalIdNodeList;
     }
 
-    private void new_non_term_id() throws Exception {
+    private NonTerminalIdNode new_non_term_id() throws Exception {
         if(currentToken.type != TokenType.ID)
             throw new ParserException("Expected: ID");
+        NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode();
+        nonTerminalIdNode.Name = currentToken.lexeme;
         ConsumeToken();
+        return nonTerminalIdNode;
     }
 
-    private List<TerminalIdNode> declares_term() throws Exception {
-        List<TerminalIdNode> terminalIdNodeList = term_name_list();
+    private List<IdNode> declares_term() throws Exception {
+        List<IdNode> terminalIdNodeList = term_name_list();
         if(currentToken.type != TokenType.SEMICOLON)
             throw new ParserException("Expected: Semicolon");
         ConsumeToken();
         return terminalIdNodeList;
     }
 
-    private List<TerminalIdNode> term_name_list() throws Exception {
+    private List<IdNode> term_name_list() throws Exception {
         TerminalIdNode terminalIdNode = new_term_id();
-        List<TerminalIdNode> terminalIdNodeList = new ArrayList<>();
+        List<IdNode> terminalIdNodeList = new ArrayList<>();
         if(currentToken.type == TokenType.COMMA){
             ConsumeToken();
             terminalIdNodeList = term_name_list();

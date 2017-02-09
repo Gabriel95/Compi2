@@ -7,5 +7,5 @@ import java.util.List;
  */
 public class SymbolNode {
     public DeclarationTypeNode className;
-    public List<TerminalIdNode> declarationList;
+    public List<IdNode> declarationList;
 }

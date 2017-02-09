@@ -1,10 +1,13 @@
 import Lexer.CupLexer;
 import ParserPK.Parser;
+import ParserPK.StatementNode;
 import Tokens.Token;
 import Tokens.TokenType;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 public class Main {
     public static void main(String args[]) throws Exception {
@@ -29,7 +32,8 @@ public class Main {
 //        }
         Parser parser = new Parser(lexer);
         try {
-            parser.Parse();
+            StatementNode list = parser.Parse();
+            //System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(list));
             System.out.println("SUCCESS!");
         }
         catch (Exception e)
