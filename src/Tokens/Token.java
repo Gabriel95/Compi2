@@ -8,13 +8,16 @@ import Tokens.TokenType;
 public class Token {
     public String lexeme;
     public TokenType type;
-
+    public int Line;
+    public int Column;
     public Token() {
 
     }
 
-    public Token(String lexeme, TokenType type) {
+    public Token(String lexeme, TokenType type, int line, int column) {
         this.lexeme = lexeme;
         this.type = type;
+        Line = line;
+        Column = column;
     }
 }

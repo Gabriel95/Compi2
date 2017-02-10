@@ -8,13 +8,20 @@ public class CupLexer {
     private int CurrentPointer;
     private boolean isJava;
     private TokenDictionary dictionary;
-
+    private int column;
+    private int line;
+    private int prevColumn;
+    private int prevLine;
     public CupLexer(String codeContent)
     {
         CodeContent = codeContent;
         CurrentPointer = 0;
         isJava = false;
         dictionary = new TokenDictionary();
+        column = 1;
+        line = 1;
+        prevLine = 1;
+        prevColumn = 1;
     }
 
     public Token getNextToken() throws Exception {
@@ -32,7 +39,7 @@ public class CupLexer {
         }
         lexeme = lexeme.substring(0,lexeme.length()-2);
         isJava = false;
-        return new Token(lexeme, TokenType.JAVACODE);
+        return new Token(lexeme, TokenType.JAVACODE, prevLine, prevColumn);
 
     }
 
@@ -60,12 +67,16 @@ public class CupLexer {
                     }
                     else if(Character.isWhitespace(currentChar))
                     {
+                        if(currentChar == '\t')
+                        {
+                            column += 3;
+                        }
                         increasePointer();
                         currentChar = getCurrentSymbol();
                     }
                     else if(currentChar == '\0')
                     {
-                        return new Token(lexeme, TokenType.EOF);
+                        return new Token(lexeme, TokenType.EOF, prevLine, prevColumn);
                     }
                     else if(currentChar == '/'){
                         increasePointer();
@@ -77,7 +88,7 @@ public class CupLexer {
                         }
                         else
                         {
-                          throw new LexerException("Unknown Token: /");
+                          throw new LexerException("Unknown Token: / at line: " + prevLine + " column: " + prevColumn);
                         }
                     }
                     break;
@@ -92,7 +103,8 @@ public class CupLexer {
                     }
                     else
                     {
-                        return new Token(lexeme,dictionary.ReservedWords.containsKey(lexeme) ? dictionary.ReservedWords.get(lexeme) : TokenType.ID);
+                        return new Token(lexeme,dictionary.ReservedWords.containsKey(lexeme) ? dictionary.ReservedWords.get(lexeme) : TokenType.ID
+                                , prevLine, prevColumn);
                     }
                     break;
                 //, . { } ( ) : ; |
@@ -112,16 +124,16 @@ public class CupLexer {
                             {
                                 lexeme += currentChar;
                                 increasePointer();
-                                return new Token(lexeme, TokenType.PRODUCTION);
+                                return new Token(lexeme, TokenType.PRODUCTION, prevLine, prevColumn);
                             }
                             else
                             {
-                                throw new LexerException("Unknown Token: " + lexeme);
+                                throw new LexerException("Unknown Token: " + lexeme + " at line: " + prevLine + " column: " + prevColumn);
                             }
                         }
                         else
                         {
-                            return new Token(lexeme, TokenType.COLON);
+                            return new Token(lexeme, TokenType.COLON, prevLine, prevColumn);
                         }
                     }
 
@@ -138,12 +150,12 @@ public class CupLexer {
                         }
                         else
                         {
-                            return new Token(lexeme, TokenType.OPEN_BRACE);
+                            return new Token(lexeme, TokenType.OPEN_BRACE, prevLine, prevColumn);
                         }
                     }
                     lexeme += currentChar;
                     increasePointer();
-                    return new Token(lexeme, dictionary.SymbolDictionary.get(lexeme));
+                    return new Token(lexeme, dictionary.SymbolDictionary.get(lexeme), prevLine, prevColumn);
                 case 3:
                     String acumm = "";
                     while(!acumm.endsWith("*/") && currentChar != '\0'){
@@ -169,6 +181,17 @@ public class CupLexer {
     }
 
     private void increasePointer(){
+        prevColumn = column;
+        prevLine = line;
+        if(CodeContent.charAt(CurrentPointer) == '\n'){
+            column = 1;
+            line++;
+        }else
+        {
+            if(CodeContent.charAt(CurrentPointer) != '\r') {
+                column++;
+            }
+        }
         CurrentPointer++;
     }
 }

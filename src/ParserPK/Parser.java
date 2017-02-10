@@ -24,7 +24,7 @@ public class Parser {
     {
         StatementNode node = Code();
         if(currentToken.type != TokenType.EOF)
-            throw new ParserException("Expected End Of File");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: End Of File");
         return node;
     }
 
@@ -74,11 +74,11 @@ public class Parser {
     private ProductionNode production() throws Exception{
         NonTerminalIdNode nonTerminalIdNode = nt_id();
         if(currentToken.type != TokenType.PRODUCTION)
-            throw new ParserException("Expected: ::=");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ::=");
         ConsumeToken();
         List<RhsNode> rhsTokenList = rhs_list();
         if(currentToken.type != TokenType.SEMICOLON)
-            throw new ParserException("Expected: SEMICOLON");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: SEMICOLON");
         ConsumeToken();
         ProductionNode product = new ProductionNode();
         product.RhsTokenList = rhsTokenList;
@@ -135,7 +135,7 @@ public class Parser {
             ConsumeToken();
         }
         else{
-            throw new ParserException("Expected ID or JavaCode");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID or JavaCode");
         }
         return prodPartNode;
     }
@@ -154,7 +154,7 @@ public class Parser {
 
     private LabelIdNode label_id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         LabelIdNode labelIdNode = new LabelIdNode();
         labelIdNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -163,7 +163,7 @@ public class Parser {
 
     private SymbolIdNode symbol_id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         SymbolIdNode symbolIdNode = new SymbolIdNode();
         symbolIdNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -175,11 +175,11 @@ public class Parser {
         {
             ConsumeToken();
             if(currentToken.type != TokenType.RW_WITH)
-                throw new ParserException("Expected: with");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: with");
             ConsumeToken();
             nt_id();
             if(currentToken.type != TokenType.SEMICOLON)
-                throw new ParserException("Expected: SEMICOLON");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: SEMICOLON");
             ConsumeToken();
         }
         else
@@ -190,7 +190,7 @@ public class Parser {
 
     private NonTerminalIdNode nt_id() throws Exception {
 //        if(currentToken.type != TokenType.ID)
-//            throw new ParserException("Expected: ID");
+//            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
 //        NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode();
 //        nonTerminalIdNode.Name = currentToken.lexeme;
 //        ConsumeToken();
@@ -225,7 +225,7 @@ public class Parser {
         {
             ConsumeToken();
             if(currentToken.type != TokenType.RW_TERMINAL)
-                throw new ParserException("Expected: key word Terminal");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: key word Terminal");
             ConsumeToken();
             NonTerminalSymbolNode nonTerminalSymbolNode;
             nonTerminalSymbolNode = non_term_declaration();
@@ -235,7 +235,7 @@ public class Parser {
 
     private NonTerminalSymbolNode non_term_declaration() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         String name = currentToken.lexeme;
         ConsumeToken();
         if(currentToken.type == TokenType.SEMICOLON)
@@ -288,13 +288,13 @@ public class Parser {
         else
         {
             //TODO?
-            throw new ParserException("Expected \';\' , \'.\' , \',\' or ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: \';\' , \'.\' , \',\' or ID");
         }
     }
 
     private TerminalSymbolNode term_declaration() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         String name = currentToken.lexeme;
         ConsumeToken();
 
@@ -350,14 +350,14 @@ public class Parser {
         else
         {
             //TODO?
-            throw new ParserException("Expected \';\' , \'.\' , \',\' or ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: \';\' , \'.\' , \',\' or ID");
         }
     }
 
     private List<IdNode> declares_non_term() throws Exception{
         List<IdNode> nonTerminalIdNodeList = non_term_name_list();
         if(currentToken.type != TokenType.SEMICOLON)
-            throw new ParserException("Expected: Semicolon");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: Semicolon");
         ConsumeToken();
         return nonTerminalIdNodeList;
     }
@@ -377,7 +377,7 @@ public class Parser {
 
     private NonTerminalIdNode new_non_term_id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         NonTerminalIdNode nonTerminalIdNode = new NonTerminalIdNode();
         nonTerminalIdNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -387,7 +387,7 @@ public class Parser {
     private List<IdNode> declares_term() throws Exception {
         List<IdNode> terminalIdNodeList = term_name_list();
         if(currentToken.type != TokenType.SEMICOLON)
-            throw new ParserException("Expected: Semicolon");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: Semicolon");
         ConsumeToken();
         return terminalIdNodeList;
     }
@@ -407,7 +407,7 @@ public class Parser {
 
     private TerminalIdNode new_term_id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         TerminalIdNode terminalIdNode = new TerminalIdNode();
         terminalIdNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -424,7 +424,7 @@ public class Parser {
             ConsumeToken();
             IdNode idNode = multiPart_Id();
             if(currentToken.type != TokenType.SEMICOLON)
-                throw new ParserException("Expected: Semicolon");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: Semicolon");
             ConsumeToken();
             PackageNode packageNode = new PackageNode();
             packageNode.IdNode = idNode;
@@ -438,7 +438,7 @@ public class Parser {
 
     private IdNode multiPart_Id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         NormalIdNode idNode = new NormalIdNode();
         idNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -452,7 +452,7 @@ public class Parser {
             ConsumeToken();
             DotAccessorNode dotAccessorNode = new DotAccessorNode();
             if(currentToken.type != TokenType.ID)
-                throw new ParserException("Expected: ID");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
             NormalIdNode idNode = new NormalIdNode();
             idNode.Name = currentToken.lexeme;
             ConsumeToken();
@@ -471,7 +471,7 @@ public class Parser {
             ConsumeToken();
             ImportIdNode importIdNode = import_id();
             if(currentToken.type != TokenType.SEMICOLON)
-                throw new ParserException("Expected: ;");
+                throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ;");
             ConsumeToken();
             List<ImportIdNode> listToReturn = import_list();
             listToReturn.add(0,importIdNode);
@@ -485,7 +485,7 @@ public class Parser {
 
     private ImportIdNode import_id() throws Exception {
         if(currentToken.type != TokenType.ID)
-            throw new ParserException("Expected: ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: ID");
         ImportIdNode importIdNode = new ImportIdNode();
         importIdNode.Name = currentToken.lexeme;
         ConsumeToken();
@@ -521,7 +521,7 @@ public class Parser {
         }
         else
         {
-            throw new ParserException("Expected * or ID");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: * or ID");
         }
     }
 
@@ -553,16 +553,16 @@ public class Parser {
 
     private ScanCodeNode scan_code() throws Exception {
         if(currentToken.type != TokenType.RW_SCAN)
-            throw new ParserException("Expected: scan");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: scan");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_WITH)
-            throw new ParserException("Expected: with");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: with");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_CODE)
-            throw new ParserException("Expected: code");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: code");
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
-            throw new ParserException("Expected: JavaCode");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: JavaCode");
         JavaCodeNode javaCodeNode = new JavaCodeNode();
         javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
@@ -574,16 +574,16 @@ public class Parser {
 
     private InitCodeNode init_code() throws Exception {
         if(currentToken.type != TokenType.RW_INIT)
-            throw new ParserException("Expected: parser");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: parser");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_WITH)
-            throw new ParserException("Expected: with");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: with");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_CODE)
-            throw new ParserException("Expected: code");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: code");
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
-            throw new ParserException("Expected: JavaCode");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: JavaCode");
         JavaCodeNode javaCodeNode = new JavaCodeNode();
         javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
@@ -595,13 +595,13 @@ public class Parser {
 
     private ParserCodePartNode parser_code_part() throws Exception {
         if(currentToken.type != TokenType.RW_PARSER)
-            throw new ParserException("Expected: parser");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: parser");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_CODE)
-            throw new ParserException("Expected: code");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: code");
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
-            throw new ParserException("Expected: JavaCode");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: JavaCode");
         JavaCodeNode javaCodeNode = new JavaCodeNode();
         javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
@@ -613,13 +613,13 @@ public class Parser {
 
     private ActionCodePartNode action_code_part() throws Exception {
         if(currentToken.type != TokenType.RW_ACTION)
-            throw new ParserException("Expected: action");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: action");
         ConsumeToken();
         if(currentToken.type != TokenType.RW_CODE)
-            throw new ParserException("Expected: code");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: code");
         ConsumeToken();
         if(currentToken.type != TokenType.JAVACODE)
-            throw new ParserException("Expected: JavaCode");
+            throw new ParserException("Error at Line " + currentToken.Line + " Column " + currentToken.Column + " Expected: JavaCode");
         JavaCodeNode javaCodeNode = new JavaCodeNode();
         javaCodeNode.Code = currentToken.lexeme;
         ConsumeToken();
