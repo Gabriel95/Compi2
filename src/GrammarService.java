@@ -33,6 +33,37 @@ public class GrammarService {
         return firstTable;
     }
 
+    private static List<RhsNode> OrderProductions(String name, List<RhsNode> rhsNodeList) {
+        int i = 0;
+        int j = 0;
+
+        while(i < rhsNodeList.size())
+        {
+            while(j < rhsNodeList.get(i).prodPartList.size())
+            {
+                if(rhsNodeList.get(i).prodPartList.get(j).symbolIdNode != null)
+                {
+                    if(rhsNodeList.get(i).prodPartList.get(j).symbolIdNode.Name.equals(name))
+                    {
+                        RhsNode rhsNode = rhsNodeList.get(i);
+                        rhsNodeList.remove(i);
+                        rhsNodeList.add(rhsNode);
+                    }
+                    else
+                    {
+                        j++;
+                    }
+                }
+                else
+                {
+                    j++;
+                }
+            }
+            i++;
+        }
+        return rhsNodeList;
+    }
+
     private static List<String> GetFirst(String x, Map<String, List<RhsNode>> grammarTable) throws Exception {
         List<String> FirstList = new ArrayList<>();
         if(SymbolTable.Instance().GetSymbolType(x) instanceof Terminal)
@@ -41,17 +72,28 @@ public class GrammarService {
             return FirstList;
         }
         List<RhsNode> rhsNodeList = grammarTable.get(x);
+        rhsNodeList = OrderProductions(x, rhsNodeList);
         for(RhsNode rhsNode : rhsNodeList)
         {
             for(ProdPartNode prodPartNode : rhsNode.prodPartList)
             {
-                List<String> resultY = GetFirst(prodPartNode.symbolIdNode.Name, grammarTable);
-                FirstList.addAll(resultY);
-                if(!resultY.contains("ɛ")) break;
+                List<String> resultY;
+                if(prodPartNode.symbolIdNode != null)
+                    if(prodPartNode.symbolIdNode.Name.equals(x))
+                    {
+                        if(!FirstList.contains("ɛ"))
+                            break;
+                    }
+                    else
+                    {
+                        resultY = GetFirst(prodPartNode.symbolIdNode.Name, grammarTable);
+                        FirstList.addAll(resultY);
+                        if(!resultY.contains("ɛ"))
+                            break;
+                    }
             }
         }
         return FirstList;
     }
-
 
 }

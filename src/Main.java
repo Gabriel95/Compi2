@@ -31,19 +31,14 @@ public class Main {
 //            t = lexer.getNextToken();
 //        }
         Parser parser = new Parser(lexer);
-        try
-        {
+
             StatementNode list = parser.Parse();
             list.EvaluateSemantic();
             String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
             Map<String, List<String>> table =  GrammarService.FirstTable(((RootNode)list).productionList);
             System.out.println(n);
             System.out.println("SUCCESS!");
-        }
-        catch (Exception e)
-        {
-            System.out.print(e.getMessage());
-        }
+
 
     }
 }
