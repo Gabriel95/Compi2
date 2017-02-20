@@ -31,9 +31,9 @@ parser code {:
 terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN;
 terminal Integer   NUMBER, ID;
 terminal           SATAN;
-
+terminal expr;
 non terminal Object     expr_list, expr_part;
-non terminal Integer    expr, factor, term;
+non terminal Integer    factor, term;
 
 
 
@@ -60,7 +60,9 @@ non terminal Integer    expr, factor, term;
                  {: RESULT = f * t; :}
                  |
                  factor:f DIVIDE term:t
-                 {: RESULT = f / t; :}
+                 {: RESULT = f /rtygbhunjmiok,l.;
+                  \78523921
+                  "}[;p.0pore4t; :}
                  |
                  term:t
                  {: RESULT = t; :}

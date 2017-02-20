@@ -1,6 +1,9 @@
 package ParserPK;
 import Lexer.CupLexer;
-import ParserPK.Nodes.*;
+import Semantic.Nodes.*;
+import Semantic.Nodes.Expression.*;
+import Semantic.Nodes.Statements.StatementNode;
+import Semantic.Nodes.Statements.*;
 import Tokens.Token;
 import Tokens.TokenType;
 

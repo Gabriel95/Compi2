@@ -1,7 +1,6 @@
 import Lexer.*;
-import Tokens.*;
 import ParserPK.Parser;
-import ParserPK.Nodes.StatementNode;
+import Semantic.Nodes.Statements.StatementNode;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,22 +21,23 @@ public class Main {
             System.out.print("error:" + e.getMessage());
         }
         CupLexer lexer = new CupLexer(cupFileContent);
-        Token t = lexer.getNextToken();
-        while(t.type != TokenType.EOF){
-            System.out.println(t.lexeme + " " + t.type);
-            t = lexer.getNextToken();
+//        Token t = lexer.getNextToken();
+//        while(t.type != TokenType.EOF){
+//            System.out.println(t.lexeme + " " + t.type);
+//            t = lexer.getNextToken();
+//        }
+        Parser parser = new Parser(lexer);
+        try {
+            StatementNode list = parser.Parse();
+            list.EvaluateSemantic();
+            String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
+            System.out.println(n);
+            System.out.println("SUCCESS!");
         }
-//        Parser parser = new Parser(lexer);
-//        try {
-//            StatementNode list = parser.Parse();
-//            String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
-//            System.out.println(n);
-//            System.out.println("SUCCESS!");
-//        }
-//        catch (Exception e)
-//        {
-//            System.out.print(e.getMessage());
-//        }
+        catch (Exception e)
+        {
+            System.out.print(e.getMessage());
+        }
 
     }
 }

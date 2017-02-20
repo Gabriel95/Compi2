@@ -60,7 +60,9 @@ non terminal Integer    expr, factor, term;
                  {: RESULT = f * t; :}
                  |
                  factor:f DIVIDE term:t
-                 {: RESULT = f / t; :}
+                 {: RESULT = f /rtygbhunjmiok,l.;
+                  \78523921
+                  "}[;p.0pore4t; :}
                  |
                  term:t
                  {: RESULT = t; :}
