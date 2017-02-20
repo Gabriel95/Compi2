@@ -12,10 +12,11 @@ import java.util.List;
  * Created by jpaz on 2/9/17.
  */
 public class ProductionNode extends StatementNode{
-    @SerializedName("RhsTokenList")
-    public List<RhsNode> RhsTokenList;
     @SerializedName("ntID")
     public NonTerminalIdNode ntID;
+
+    @SerializedName("RhsTokenList")
+    public List<RhsNode> RhsTokenList;
 
     @Override
     public void EvaluateSemantic() throws Exception {

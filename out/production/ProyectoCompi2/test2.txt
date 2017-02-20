@@ -1,0 +1,11 @@
+import java_cup.runtime.*;
+
+
+terminal PLUS, STAR, ID, OPEN, CLOSE, ɛ;
+non terminal e, e_prime, t, t_prime, f;
+
+e ::= t e_prime;
+e_prime ::= PLUS t e_prime | ɛ ;
+t ::= f t_prime;
+t_prime ::= STAR f t_prime | ɛ;
+f ::= ID | OPEN e CLOSE;

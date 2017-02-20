@@ -1,36 +1,8 @@
 import java_cup.runtime.*;
-/*
-parser code {:
 
-    public void report_error(String message, Object info) {
-
-        StringBuilder m = new StringBuilder("Error");
-
-        if (info instanceof java_cup.runtime.Symbol) {
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-
-            if (s.left >= 0) {
-                m.append(" in line "+(s.left+1));
-                if (s.right >= 0)
-                    m.append(", column "+(s.right+1));
-            }
-        }
-
-        m.append(" : "+message);
-
-        System.err.println(m);
-    }
-
-    public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
-        System.exit(1);
-    }
-:};
-*/
 
 terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN;
 terminal Integer   NUMBER, ID;
-terminal           SATAN;
 
 non terminal Object     expr_list, expr_part;
 non terminal Integer    expr, factor, term;
@@ -60,9 +32,7 @@ non terminal Integer    expr, factor, term;
                  {: RESULT = f * t; :}
                  |
                  factor:f DIVIDE term:t
-                 {: RESULT = f /rtygbhunjmiok,l.;
-                  \78523921
-                  "}[;p.0pore4t; :}
+                 {: RESULT = f /t; :}
                  |
                  term:t
                  {: RESULT = t; :}
