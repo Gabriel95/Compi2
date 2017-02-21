@@ -23,11 +23,11 @@ public class AutomataService {
         Map<String, List<String>> firstTable =  GrammarService.FirstTable(f);
         Map<String, List<List<String>>> grammarTable = ConvertionService.GrammarTable(productionNodeList);
         AutomataNode automataNode = CreateRootNode(productionNodeList,firstTable);
+        GetNextNodes(automataNode,firstTable,grammarTable);
         return automataNode;
     }
 
-    public static void GetNextNodes(AutomataNode automataNode, Map<String, List<String>> firstTable, Map<String, List<List<String>>> grammarTable)
-    {
+    public static void GetNextNodes(AutomataNode automataNode, Map<String, List<String>> firstTable, Map<String, List<List<String>>> grammarTable) throws Exception {
         List<String> doneSymbols = new ArrayList<>();
 
         for(NodeLine nodeLine : automataNode.lineCollection)
@@ -36,20 +36,39 @@ public class AutomataService {
             {
                 if(!doneSymbols.contains(nodeLine.Production.get(nodeLine.dot)))
                 {
-                    AutomataNode node = GoTo(nodeLine.Production.get(nodeLine.dot),automataNode.lineCollection);
+                    AutomataNode node = GoTo(nodeLine.Production.get(nodeLine.dot),automataNode.lineCollection, firstTable, grammarTable);
                     doneSymbols.add(nodeLine.Production.get(nodeLine.dot));
                 }
             }
         }
     }
 
-    private static AutomataNode GoTo(String s, List<NodeLine> lineCollection) {
+    private static AutomataNode GoTo(String s, List<NodeLine> lineCollection, Map<String, List<String>> firstTable, Map<String, List<List<String>>> grammarTable) throws Exception {
         AutomataNode automataNode = new AutomataNode();
-        for(NodeLine nodeLine : automataNode.lineCollection)
+        List<String> doneSymbols = new ArrayList<>();
+        for(NodeLine nodeLine : lineCollection)
         {
             if(nodeLine.dot < nodeLine.Production.size())
             {
-
+                if(nodeLine.Production.get(nodeLine.dot).equals(s))
+                {
+                    NodeLine node = new NodeLine(nodeLine.Producer);
+                    node.Production.addAll(nodeLine.Production);
+                    node.dot = nodeLine.dot + 1;
+                    node.F.addAll(nodeLine.F);
+                    automataNode.lineCollection.add(node);
+                    if(node.dot < node.Production.size())
+                    {
+                        if(!doneSymbols.contains(node.Production.get(node.dot)))
+                        {
+                            if(SymbolTable.Instance().GetSymbolType(node.Production.get(node.dot)) instanceof NonTerminal)
+                            {
+                                automataNode.lineCollection.addAll(GetClosure(node,grammarTable,firstTable));
+                                doneSymbols.add(node.Production.get(node.dot));
+                            }
+                        }
+                    }
+                }
             }
         }
         return automataNode;
