@@ -1,3 +1,5 @@
+package Automata;
+
 import Semantic.Nodes.Expression.ProdPartNode;
 import Semantic.Nodes.Expression.RhsNode;
 import Semantic.Nodes.Statements.ProductionNode;
@@ -60,7 +62,7 @@ public class GrammarService {
         return rhsNodeList;
     }
 
-    private static List<String> GetFirst(String x, Map<String, List<RhsNode>> grammarTable) throws Exception {
+    public static List<String> GetFirst(String x, Map<String, List<RhsNode>> grammarTable) throws Exception {
         List<String> FirstList = new ArrayList<>();
         if(SymbolTable.Instance().GetSymbolType(x) instanceof Terminal)
         {
@@ -102,12 +104,12 @@ public class GrammarService {
         return followTable;
     }
 
-    private static List<String> GetFollow(String name, List<ProductionNode> productionNodeList, String root) throws Exception {
+    public static List<String> GetFollow(String name, List<ProductionNode> productionNodeList, String root) throws Exception {
 
         List<String> followList = new ArrayList<>();
         if(name.equals(root))
         {
-            followList.add("$");
+//            followList.add("$");
         }
         for(ProductionNode productionNode : productionNodeList)
         {

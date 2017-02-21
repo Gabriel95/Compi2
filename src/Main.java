@@ -1,6 +1,6 @@
+import Automata.AutomataService;
 import Lexer.*;
 import ParserPK.Parser;
-import Semantic.Nodes.Expression.ProdPartNode;
 import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Nodes.Statements.RootNode;
 import Semantic.Nodes.Statements.StatementNode;
@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
     public static void main(String args[]) throws Exception {
@@ -28,6 +27,7 @@ public class Main {
             System.out.print("error:" + e.getMessage());
         }
         CupLexer lexer = new CupLexer(cupFileContent);
+
 //        Token t = lexer.getNextToken();
 //        while(t.type != TokenType.EOF){
 //            System.out.println(t.lexeme + " " + t.type);
@@ -39,12 +39,8 @@ public class Main {
             list.EvaluateSemantic();
             String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
             List<ProductionNode> f = new ArrayList<>();
-            List<ProductionNode> ff = new ArrayList<>();
             f.addAll(((RootNode)list).productionList);
-            ff.addAll(((RootNode)list).productionList);
-            Map<String, List<String>> firstTable =  GrammarService.FirstTable(f);
-            Map<String, List<String>> followTable = GrammarService.FollowTable(ff);
-            System.out.println(n);
+            AutomataService.GetAutomata(f);
             System.out.println("SUCCESS!");
 
 
