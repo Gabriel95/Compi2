@@ -4,10 +4,7 @@ import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jpaz on 2/20/17.
@@ -25,7 +22,6 @@ public class GrammarService {
     public static Map<String, List<String>> FirstTable (List<ProductionNode> productionNodeList) throws Exception {
         Map<String, List<String>> firstTable = new HashMap<>();
         Map<String, List<RhsNode>> grammarTable = GetGrammarTable(productionNodeList);
-
         for(ProductionNode productionNode : productionNodeList)
         {
             firstTable.put(productionNode.ntID.Name,GetFirst(productionNode.ntID.Name,grammarTable));
@@ -94,6 +90,69 @@ public class GrammarService {
             }
         }
         return FirstList;
+    }
+
+    public static Map<String,List<String>> FollowTable (List<ProductionNode> productionNodeList) throws Exception {
+        Map<String, List<String>> followTable = new HashMap<>();
+        String root = productionNodeList.get(0).ntID.Name;
+        for(ProductionNode productionNode : productionNodeList)
+        {
+            followTable.put(productionNode.ntID.Name,GetFollow(productionNode.ntID.Name,productionNodeList,root));
+        }
+        return followTable;
+    }
+
+    private static List<String> GetFollow(String name, List<ProductionNode> productionNodeList, String root) throws Exception {
+
+        List<String> followList = new ArrayList<>();
+        if(name.equals(root))
+        {
+            followList.add("$");
+        }
+        for(ProductionNode productionNode : productionNodeList)
+        {
+            for(RhsNode rhsNode : productionNode.RhsTokenList)
+            {
+                for(int i = 0; i < rhsNode.prodPartList.size(); i++)
+                {
+                    if(rhsNode.prodPartList.get(i).symbolIdNode != null)
+                    {
+                        if(rhsNode.prodPartList.get(i).symbolIdNode.Name.equals(name))
+                        {
+                            if(i + 1 == rhsNode.prodPartList.size())
+                            {
+                                if(!productionNode.ntID.Name.equals(name))
+                                {
+                                    followList.addAll(GetFollow(productionNode.ntID.Name,productionNodeList,root));
+                                }
+                            }
+                            else if(rhsNode.prodPartList.get(i+1) == null)
+                            {
+                                if(!productionNode.ntID.Name.equals(name))
+                                {
+                                    followList.addAll(GetFollow(productionNode.ntID.Name,productionNodeList,root));
+                                }
+                            }
+                            else
+                            {
+                                List<String> result = GetFirst(rhsNode.prodPartList.get(i + 1).symbolIdNode.Name, GetGrammarTable(productionNodeList));
+                                if(result.contains("ɛ"))
+                                {
+                                    result.remove("ɛ");
+                                    followList.addAll(GetFollow(productionNode.ntID.Name,productionNodeList,root));
+                                }
+                                followList.addAll(result);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Set<String> hs = new HashSet<>();
+        hs.addAll(followList);
+        followList.clear();
+        followList.addAll(hs);
+        return followList;
     }
 
 }

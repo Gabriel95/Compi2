@@ -1,10 +1,13 @@
 import Lexer.*;
 import ParserPK.Parser;
+import Semantic.Nodes.Expression.ProdPartNode;
+import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Nodes.Statements.RootNode;
 import Semantic.Nodes.Statements.StatementNode;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +38,12 @@ public class Main {
             StatementNode list = parser.Parse();
             list.EvaluateSemantic();
             String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
-            Map<String, List<String>> table =  GrammarService.FirstTable(((RootNode)list).productionList);
+            List<ProductionNode> f = new ArrayList<>();
+            List<ProductionNode> ff = new ArrayList<>();
+            f.addAll(((RootNode)list).productionList);
+            ff.addAll(((RootNode)list).productionList);
+            Map<String, List<String>> firstTable =  GrammarService.FirstTable(f);
+            Map<String, List<String>> followTable = GrammarService.FollowTable(ff);
             System.out.println(n);
             System.out.println("SUCCESS!");
 
