@@ -1,7 +1,7 @@
 import java_cup.runtime.*;
 
 /*
-terminal PLUS, STAR, ID, OPEN, CLOSE, ɛ;
+terminal PLUS, STAR, ID, OPEN, CLOSE,   ɛ;
 non terminal e, e_prime, t, t_prime, f;
 
 e ::= e PLUS t | t;

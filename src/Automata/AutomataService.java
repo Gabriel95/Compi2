@@ -172,11 +172,17 @@ public class AutomataService {
                 NodeLine toAdd = new NodeLine(postDot);
                 toAdd.Production.addAll(production);
                 toAdd.F.addAll(F);
-                closure.add(toAdd);
-                if(SymbolTable.Instance().GetSymbolType(toAdd.Production.get(toAdd.dot)) instanceof NonTerminal
-                        && !toAdd.Production.get(toAdd.dot).equals(postDot)){
-                    closure.addAll(GetClosure(toAdd,grammarTable, rhsGrammarTable));
+                if(toAdd.Production.get(toAdd.dot).equals("ɛ"))
+                {
+                    toAdd.dot++;
                 }
+
+                closure.add(toAdd);
+                if(toAdd.dot < toAdd.Production.size())
+                    if(SymbolTable.Instance().GetSymbolType(toAdd.Production.get(toAdd.dot)) instanceof NonTerminal
+                            && !toAdd.Production.get(toAdd.dot).equals(postDot)){
+                        closure.addAll(GetClosure(toAdd,grammarTable, rhsGrammarTable));
+                    }
             }
         }
         return closure;
