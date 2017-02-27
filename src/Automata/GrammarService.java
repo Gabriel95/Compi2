@@ -21,7 +21,8 @@ public class GrammarService {
         }
         return grammarTable;
     }
-    public static Map<String, List<String>> FirstTable (List<ProductionNode> productionNodeList) throws Exception {
+    public static Map<String, List<String>> FirstTable (List<ProductionNode> productionNodeList) throws Exception
+    {
         Map<String, List<String>> firstTable = new HashMap<>();
         Map<String, List<RhsNode>> grammarTable = GetGrammarTable(productionNodeList);
         for(ProductionNode productionNode : productionNodeList)
@@ -31,7 +32,8 @@ public class GrammarService {
         return firstTable;
     }
 
-    private static List<RhsNode> OrderProductions(String name, List<RhsNode> rhsNodeList) {
+    private static List<RhsNode> OrderProductions(String name, List<RhsNode> rhsNodeList)
+    {
         int i = 0;
         int j = 0;
 
@@ -43,9 +45,16 @@ public class GrammarService {
                 {
                     if(rhsNodeList.get(i).prodPartList.get(j).symbolIdNode.Name.equals(name))
                     {
-                        RhsNode rhsNode = rhsNodeList.get(i);
-                        rhsNodeList.remove(i);
-                        rhsNodeList.add(rhsNode);
+                        if(j + 1 < rhsNodeList.get(i).prodPartList.size())
+                        {
+                            RhsNode rhsNode = rhsNodeList.get(i);
+                            rhsNodeList.remove(i);
+                            rhsNodeList.add(rhsNode);
+                        }
+                        else
+                        {
+                            j++;
+                        }
                     }
                     else
                     {
@@ -62,7 +71,8 @@ public class GrammarService {
         return rhsNodeList;
     }
 
-    public static List<String> GetFirst(String x, Map<String, List<RhsNode>> grammarTable) throws Exception {
+    public static List<String> GetFirst(String x, Map<String, List<RhsNode>> grammarTable) throws Exception
+    {
         List<String> FirstList = new ArrayList<>();
         if(SymbolTable.Instance().GetSymbolType(x) instanceof Terminal)
         {
@@ -94,7 +104,8 @@ public class GrammarService {
         return FirstList;
     }
 
-    public static Map<String,List<String>> FollowTable (List<ProductionNode> productionNodeList) throws Exception {
+    public static Map<String,List<String>> FollowTable (List<ProductionNode> productionNodeList) throws Exception
+    {
         Map<String, List<String>> followTable = new HashMap<>();
         String root = productionNodeList.get(0).ntID.Name;
         for(ProductionNode productionNode : productionNodeList)
@@ -104,7 +115,8 @@ public class GrammarService {
         return followTable;
     }
 
-    public static List<String> GetFollow(String name, List<ProductionNode> productionNodeList, String root) throws Exception {
+    public static List<String> GetFollow(String name, List<ProductionNode> productionNodeList, String root) throws Exception
+    {
 
         List<String> followList = new ArrayList<>();
         if(name.equals(root))
@@ -157,4 +169,35 @@ public class GrammarService {
         return followList;
     }
 
+    public static List<GrammarLine> GetNonSimplifiedGrammarTable(List<ProductionNode> productionNodeList)
+    {
+        List<GrammarLine> nonSimplifiedGrammarTable = new ArrayList<>();
+        for(ProductionNode productionNode : productionNodeList)
+        {
+            for(RhsNode rhsNode : productionNode.RhsTokenList)
+            {
+                List<String> toAdd = new ArrayList<>();
+                for(ProdPartNode prodPartNode : rhsNode.prodPartList)
+                {
+                    if(prodPartNode.symbolIdNode != null)
+                        toAdd.add(prodPartNode.symbolIdNode.Name);
+                }
+                nonSimplifiedGrammarTable.add(new GrammarLine(productionNode.ntID.Name, toAdd));
+            }
+        }
+        return nonSimplifiedGrammarTable;
+    }
+
+
+    public static String GetReduction(NodeLine nodeLine, List<GrammarLine> grammar)
+    {
+        for(int i = 0; i < grammar.size(); i++)
+        {
+            if(nodeLine.Production.equals(grammar.get(i).Productions))
+            {
+                return "r" + (i + 1);
+            }
+        }
+        return null;
+    }
 }

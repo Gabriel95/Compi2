@@ -16,7 +16,9 @@ public class AutomataService {
     public static int name = 1;
     public static List<AutomataNode> aNodeList = new ArrayList<>();
     public static int dynamicSize = 1;
-    public static AutomataNode GetAutomata(List<ProductionNode> productionNodeList) throws Exception {
+
+    public static List<AutomataNode> GetAutomata(List<ProductionNode> productionNodeList) throws Exception
+    {
         List<ProductionNode> f = new ArrayList<>();
         f.addAll(productionNodeList);
         Map<String, List<RhsNode>> rhsGrammarTable =  GrammarService.GetGrammarTable(f);
@@ -29,10 +31,12 @@ public class AutomataService {
             GetNextNodes(aNodeList.get(i),rhsGrammarTable,grammarTable);
             i++;
         }
-        return automataNode;
+        List<AutomataNode> toReturn = new ArrayList<>(aNodeList);
+        return toReturn;
     }
 
-    private static void GetNextNodes(AutomataNode automataNode, Map<String, List<RhsNode>> rhsGrammarTable, Map<String, List<List<String>>> grammarTable) throws Exception {
+    private static void GetNextNodes(AutomataNode automataNode, Map<String, List<RhsNode>> rhsGrammarTable, Map<String, List<List<String>>> grammarTable) throws Exception
+    {
         List<String> doneSymbols = new ArrayList<>();
         for(NodeLine nodeLine : automataNode.lineCollection)
         {
@@ -41,7 +45,7 @@ public class AutomataService {
                 if(!doneSymbols.contains(nodeLine.Production.get(nodeLine.dot)))
                 {
                     AutomataNode node = GoTo(nodeLine.Production.get(nodeLine.dot),automataNode.lineCollection, rhsGrammarTable, grammarTable);
-                    node = ProcessPosibleNewNode(node);
+                    node = ProcessPossibleNewNode(node);
                     if(SymbolTable.Instance().GetSymbolType(nodeLine.Production.get(nodeLine.dot)) instanceof Terminal)
                     {
                         automataNode.Displacements.put(nodeLine.Production.get(nodeLine.dot),node);
@@ -56,7 +60,8 @@ public class AutomataService {
         }
     }
 
-    private static AutomataNode ProcessPosibleNewNode(AutomataNode node) {
+    private static AutomataNode ProcessPossibleNewNode(AutomataNode node)
+    {
 
         for(AutomataNode automataNode : aNodeList)
         {
@@ -71,7 +76,8 @@ public class AutomataService {
         return node;
     }
 
-    private static boolean CheckIfNodeIsSame(AutomataNode automataNode, AutomataNode node) {
+    private static boolean CheckIfNodeIsSame(AutomataNode automataNode, AutomataNode node)
+    {
         if(automataNode.lineCollection.size() != node.lineCollection.size())
             return false;
 
@@ -109,7 +115,8 @@ public class AutomataService {
         return true;
     }
 
-    private static AutomataNode GoTo(String s, List<NodeLine> lineCollection, Map<String, List<RhsNode>> rhsGrammarTable, Map<String, List<List<String>>> grammarTable) throws Exception {
+    private static AutomataNode GoTo(String s, List<NodeLine> lineCollection, Map<String, List<RhsNode>> rhsGrammarTable, Map<String, List<List<String>>> grammarTable) throws Exception
+    {
         AutomataNode automataNode = new AutomataNode();
         List<String> doneSymbols = new ArrayList<>();
         for(NodeLine nodeLine : lineCollection)
@@ -159,7 +166,8 @@ public class AutomataService {
         return automataNode;
     }
 
-    private static List<NodeLine> GetClosure(NodeLine nodeLine, Map<String, List<List<String>>> grammarTable, Map<String, List<RhsNode>> rhsGrammarTable) throws Exception {
+    private static List<NodeLine> GetClosure(NodeLine nodeLine, Map<String, List<List<String>>> grammarTable, Map<String, List<RhsNode>> rhsGrammarTable) throws Exception
+    {
         List<NodeLine> closure = new ArrayList<>();
         String postDot = nodeLine.Production.get(nodeLine.dot);
         List<String> F = GetF(nodeLine, rhsGrammarTable);
@@ -188,7 +196,8 @@ public class AutomataService {
         return closure;
     }
 
-    private static List<String> GetF(NodeLine nodeLine, Map<String, List<RhsNode>> rhsGrammarTable) throws Exception {
+    private static List<String> GetF(NodeLine nodeLine, Map<String, List<RhsNode>> rhsGrammarTable) throws Exception
+    {
         List<String> F = new ArrayList<>();
         int dot = nodeLine.dot;
         if(dot + 1 == nodeLine.Production.size())

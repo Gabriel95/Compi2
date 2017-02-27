@@ -1,9 +1,14 @@
+import Automata.AutomataNode;
 import Automata.AutomataService;
+import Automata.GrammarLine;
+import Automata.GrammarService;
 import Lexer.*;
 import ParserPK.Parser;
 import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Nodes.Statements.RootNode;
 import Semantic.Nodes.Statements.StatementNode;
+import Table.TableService;
+import com.google.common.collect.RowSortedTable;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,10 +42,15 @@ public class Main {
 
             StatementNode list = parser.Parse();
             list.EvaluateSemantic();
-            String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
+//            String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
             List<ProductionNode> f = new ArrayList<>();
             f.addAll(((RootNode)list).productionList);
-            AutomataService.GetAutomata(f);
+
+            List<ProductionNode> f2 = new ArrayList<>(((RootNode)list).productionList);
+
+            List<AutomataNode> automata = AutomataService.GetAutomata(f);
+            List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
+            RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
             System.out.println("SUCCESS!");
 
 
