@@ -67,13 +67,55 @@ public class AutomataService {
         {
             if(CheckIfNodeIsSame(automataNode,node))
                 return automataNode;
+            if(CheckIfNodeIsEquivalent(automataNode,node))
+            {
+                for(int i = 0; i < automataNode.lineCollection.size(); i++)
+                {
+                    automataNode.lineCollection.get(i).F.addAll(node.lineCollection.get(i).F);
+                    Set<String> hs = new HashSet<>();
+                    hs.addAll(automataNode.lineCollection.get(i).F);
+                    automataNode.lineCollection.get(i).F.clear();
+                    automataNode.lineCollection.get(i).F.addAll(hs);
+                }
+
+                return automataNode;
+            }
         }
-//        node.name = UUID.randomUUID().toString();
         node.name = "I" + name;
         name++;
         aNodeList.add(node);
         dynamicSize = aNodeList.size();
         return node;
+    }
+
+    private static boolean CheckIfNodeIsEquivalent(AutomataNode automataNode, AutomataNode node)
+    {
+        if(automataNode.lineCollection.size() != node.lineCollection.size())
+            return false;
+
+        for(int i = 0; i < automataNode.lineCollection.size(); i++)
+        {
+            if(!automataNode.lineCollection.get(i).Producer.equals(node.lineCollection.get(i).Producer))
+                return false;
+
+            if(automataNode.lineCollection.get(i).Production.size() != node.lineCollection.get(i).Production.size())
+                return false;
+
+            List<String> temp1 = new ArrayList<>(automataNode.lineCollection.get(i).Production);
+            List<String> temp2 = new ArrayList<>(node.lineCollection.get(i).Production);
+
+            Collections.sort(temp1);
+            Collections.sort(temp2);
+
+            if(!temp1.equals(temp2))
+                return false;
+
+            if(automataNode.lineCollection.get(i).dot != node.lineCollection.get(i).dot)
+                return false;
+
+        }
+
+        return true;
     }
 
     private static boolean CheckIfNodeIsSame(AutomataNode automataNode, AutomataNode node)

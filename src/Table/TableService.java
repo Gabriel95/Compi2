@@ -7,7 +7,6 @@ import Automata.NodeLine;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.TreeBasedTable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class TableService {
             {
                 if(nodeLine.dot == nodeLine.Production.size())
                 {
-                    for ( String f :nodeLine.F)
+                    for ( String f : nodeLine.F)
                     {
                         if(nodeLine.Producer.equals("S_prime"))
                         {
