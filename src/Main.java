@@ -51,6 +51,8 @@ public class Main {
             List<AutomataNode> automata = AutomataService.GetAutomata(f);
             List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
             RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
+            String n = new GsonBuilder().setPrettyPrinting().create().toJson(table);
+            System.out.println(n);
             System.out.println("SUCCESS!");
 
 

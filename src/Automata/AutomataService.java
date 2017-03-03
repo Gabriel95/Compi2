@@ -31,8 +31,58 @@ public class AutomataService {
             GetNextNodes(aNodeList.get(i),rhsGrammarTable,grammarTable);
             i++;
         }
-        List<AutomataNode> toReturn = new ArrayList<>(aNodeList);
+        List<AutomataNode> toReturn = ReduceAutomata(aNodeList);
+
         return toReturn;
+    }
+
+    private static List<AutomataNode> ReduceAutomata(List<AutomataNode> aNodeList) {
+
+        List<String> donotEvaluate = new ArrayList<>();
+        List<AutomataNode> reducedAutomata = new ArrayList<>();
+        int name2 = 0;
+        for(int i = 0; i < aNodeList.size(); i++)
+        {
+            for(int j = 0; j < aNodeList.size(); j++)
+            {
+                if(!aNodeList.get(i).name.equals(aNodeList.get(j).name) && !donotEvaluate.contains(aNodeList.get(i).name))
+                {
+                    if(CheckIfNodeIsEquivalent(aNodeList.get(i),aNodeList.get(j)))
+                    {
+                        for(int k = 0; k < aNodeList.get(i).lineCollection.size(); k++)
+                        {
+                            aNodeList.get(i).lineCollection.get(k).F.addAll(aNodeList.get(j).lineCollection.get(k).F);
+                            Set<String> hs = new HashSet<>();
+                            hs.addAll(aNodeList.get(i).lineCollection.get(k).F);
+                            aNodeList.get(i).lineCollection.get(k).F.clear();
+                            aNodeList.get(i).lineCollection.get(k).F.addAll(hs);
+                        }
+                        donotEvaluate.add(aNodeList.get(j).name);
+                        for (AutomataNode automataNode : aNodeList)
+                        {
+                            for (Object o : automataNode.Displacements.entrySet()) {
+                                Map.Entry pair = (Map.Entry) o;
+                                if (((AutomataNode) pair.getValue()).name.equals(aNodeList.get(j).name))
+                                    pair.setValue(aNodeList.get(i));
+                            }
+
+                            for (Object o : automataNode.GoTos.entrySet()) {
+                                Map.Entry pair = (Map.Entry) o;
+                                if (((AutomataNode) pair.getValue()).name.equals(aNodeList.get(j).name))
+                                    pair.setValue(aNodeList.get(i));
+                            }
+                        }
+                    }
+                }
+            }
+            if(!donotEvaluate.contains(aNodeList.get(i).name))
+            {
+                aNodeList.get(i).name = "I" + name2;
+                name2++;
+                reducedAutomata.add(aNodeList.get(i));
+            }
+        }
+        return reducedAutomata;
     }
 
     private static void GetNextNodes(AutomataNode automataNode, Map<String, List<RhsNode>> rhsGrammarTable, Map<String, List<List<String>>> grammarTable) throws Exception
@@ -67,19 +117,6 @@ public class AutomataService {
         {
             if(CheckIfNodeIsSame(automataNode,node))
                 return automataNode;
-            if(CheckIfNodeIsEquivalent(automataNode,node))
-            {
-                for(int i = 0; i < automataNode.lineCollection.size(); i++)
-                {
-                    automataNode.lineCollection.get(i).F.addAll(node.lineCollection.get(i).F);
-                    Set<String> hs = new HashSet<>();
-                    hs.addAll(automataNode.lineCollection.get(i).F);
-                    automataNode.lineCollection.get(i).F.clear();
-                    automataNode.lineCollection.get(i).F.addAll(hs);
-                }
-
-                return automataNode;
-            }
         }
         node.name = "I" + name;
         name++;
@@ -222,17 +259,37 @@ public class AutomataService {
                 NodeLine toAdd = new NodeLine(postDot);
                 toAdd.Production.addAll(production);
                 toAdd.F.addAll(F);
-                if(toAdd.Production.get(toAdd.dot).equals("ɛ"))
-                {
-                    toAdd.dot++;
-                }
-
                 closure.add(toAdd);
+                //TODO
                 if(toAdd.dot < toAdd.Production.size())
+                {
+                    if(toAdd.Production.get(toAdd.dot).equals(postDot) && toAdd.dot + 1 < toAdd.Production.size())
+                    {
+                        if(GrammarService.GetFirst(toAdd.Production.get(toAdd.dot),rhsGrammarTable).contains("ɛ"))
+                        {
+                            int i = 1;
+                            while(true)
+                            {
+                                List<String> first = GrammarService.GetFirst(toAdd.Production.get(toAdd.dot + i),rhsGrammarTable);
+                                toAdd.F.addAll(first);
+                                if(!first.contains("ɛ"))
+                                {
+                                    break;
+                                }
+                                if(toAdd.dot + i + 1 == toAdd.Production.size())
+                                {
+//                                F.addAll(nodeLine.F);
+                                    break;
+                                }
+                                i++;
+                            }
+                        }
+                    }
                     if(SymbolTable.Instance().GetSymbolType(toAdd.Production.get(toAdd.dot)) instanceof NonTerminal
                             && !toAdd.Production.get(toAdd.dot).equals(postDot)){
                         closure.addAll(GetClosure(toAdd,grammarTable, rhsGrammarTable));
                     }
+                }
             }
         }
         return closure;
