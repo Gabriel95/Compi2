@@ -13,9 +13,10 @@ import java.util.*;
  */
 public class AutomataService {
 
-    public static int name = 1;
-    public static List<AutomataNode> aNodeList = new ArrayList<>();
-    public static int dynamicSize = 1;
+    private static int name = 1;
+    private static List<AutomataNode> aNodeList = new ArrayList<>();
+    private static Map<String,List<String>> allLookUps = new HashMap<>();
+    private static int dynamicSize = 1;
 
     public static List<AutomataNode> GetAutomata(List<ProductionNode> productionNodeList) throws Exception
     {
@@ -105,6 +106,7 @@ public class AutomataService {
                         automataNode.GoTos.put(nodeLine.Production.get(nodeLine.dot),node);
                     }
                     doneSymbols.add(nodeLine.Production.get(nodeLine.dot));
+                    allLookUps.clear();
                 }
             }
         }
@@ -251,7 +253,6 @@ public class AutomataService {
         String postDot = nodeLine.Production.get(nodeLine.dot);
         List<String> F = GetF(nodeLine, rhsGrammarTable);
         List<List<String>> productions = grammarTable.get(postDot);
-
         for(List<String> production : productions)
         {
             if(!postDot.equals("S_prime"))
@@ -265,25 +266,47 @@ public class AutomataService {
                 {
                     if(toAdd.Production.get(toAdd.dot).equals(postDot) && toAdd.dot + 1 < toAdd.Production.size())
                     {
-                        if(GrammarService.GetFirst(toAdd.Production.get(toAdd.dot),rhsGrammarTable).contains("ɛ"))
+                        int i = 1;
+                        while(true)
                         {
-                            int i = 1;
-                            while(true)
+                            List<String> first = GrammarService.GetFirst(toAdd.Production.get(toAdd.dot + i),rhsGrammarTable);
+                            toAdd.F.addAll(first);
+                            if(!first.contains("ɛ"))
                             {
-                                List<String> first = GrammarService.GetFirst(toAdd.Production.get(toAdd.dot + i),rhsGrammarTable);
-                                toAdd.F.addAll(first);
-                                if(!first.contains("ɛ"))
-                                {
-                                    break;
-                                }
-                                if(toAdd.dot + i + 1 == toAdd.Production.size())
-                                {
-//                                F.addAll(nodeLine.F);
-                                    break;
-                                }
-                                i++;
+                                break;
                             }
+                            if(toAdd.dot + i + 1 == toAdd.Production.size())
+                            {
+                                toAdd.F.addAll(nodeLine.F);
+                                Set<String> hs = new HashSet<>();
+                                hs.addAll(toAdd.F);
+                                toAdd.F.clear();
+                                toAdd.F.addAll(hs);
+                                break;
+                            }
+                            i++;
                         }
+
+                        if(allLookUps.containsKey(toAdd.Producer))
+                        {
+                            allLookUps.get(toAdd.Producer).addAll(toAdd.F);
+                            Set<String> hs = new HashSet<>();
+                            hs.addAll(allLookUps.get(toAdd.Producer));
+                            allLookUps.get(toAdd.Producer).clear();
+                            allLookUps.get(toAdd.Producer).addAll(hs);
+                        }
+                        else
+                        {
+                            allLookUps.put(toAdd.Producer,toAdd.F);
+                        }
+                    }
+                    if(allLookUps.containsKey(toAdd.Producer))
+                    {
+                        toAdd.F.addAll(allLookUps.get(toAdd.Producer));
+                        Set<String> hs = new HashSet<>();
+                        hs.addAll(toAdd.F);
+                        toAdd.F.clear();
+                        toAdd.F.addAll(hs);
                     }
                     if(SymbolTable.Instance().GetSymbolType(toAdd.Production.get(toAdd.dot)) instanceof NonTerminal
                             && !toAdd.Production.get(toAdd.dot).equals(postDot)){
@@ -292,6 +315,22 @@ public class AutomataService {
                 }
             }
         }
+
+//        for (Object o : allLookUps.entrySet()) {
+//            Map.Entry pair = (Map.Entry) o;
+//            for(NodeLine line : closure)
+//            {
+//                if(line.Producer.equals(pair.getKey()))
+//                {
+//                    line.F.addAll((List<String>)pair.getValue());
+//                    Set<String> hs = new HashSet<>();
+//                    hs.addAll(line.F);
+//                    line.F.clear();
+//                    line.F.addAll(hs);
+//                }
+//            }
+//        }
+
         return closure;
     }
 

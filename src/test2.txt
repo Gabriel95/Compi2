@@ -1,12 +1,12 @@
 import java_cup.runtime.*;
 
 /*
-terminal PLUS, STAR, ID, OPEN, CLOSE,   ɛ;
+terminal PLUS, STAR, a, OPEN, CLOSE,   ɛ;
 non terminal e, e_prime, t, t_prime, f;
 
 e ::= e PLUS t | t;
 t ::= t STAR f | f;
-f ::= ID | OPEN e CLOSE;
+f ::=   OPEN e CLOSE | a;
 
 
 terminal a, b, d, ɛ;
@@ -25,6 +25,11 @@ non terminal S,C;
 
 S ::= C C;
 C ::= x C | d;
+
+non terminal S;
+terminal a, b;
+
+S ::= a S b S | a;
 */
 
 non terminal E, T, F;
