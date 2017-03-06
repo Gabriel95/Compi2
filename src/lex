@@ -1,0 +1,42 @@
+%%
+
+%class Lex
+%type Symbol
+%line
+%column
+
+
+
+%{
+    private Symbol symbol(int type) {
+        return new Symbol(type, yyline, yycolumn);
+    }
+
+    private Symbol symbol(int type, Object value) {
+        return new Symbol(type, yyline, yycolumn, value);
+    }
+%}
+
+
+LineTerminator = \r|\n|\r\n
+
+WhiteSpace     = {LineTerminator} | [ \t\f]
+
+
+%%
+
+<YYINITIAL> {
+
+    "+"                { return symbol(sym.PLUS, yytext()); }
+    "("                { return symbol(sym.OPEN, yytext()); }
+    ")"                { return symbol(sym.CLOSE, yytext()); }
+    "*"                { return symbol(sym.STAR, yytext()); }
+    "a"                { return symbol(sym.a, yytext()); }
+    "b"                { return symbol(sym.b, yytext()); }
+    "e"                { return symbol(sym.e, yytext()); }
+
+    {WhiteSpace}       { /* just skip what was found, do nothing */ }
+}
+
+
+[^]                    { throw new Error("Illegal character <"+yytext()+">"); }

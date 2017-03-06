@@ -12,6 +12,7 @@ import com.google.common.collect.RowSortedTable;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,39 +32,32 @@ public class Main {
         catch(Exception e){
             System.out.print("error:" + e.getMessage());
         }
-        CupLexer lexer = new CupLexer(cupFileContent);
 
-//        Token t = lexer.getNextToken();
-//        while(t.type != TokenType.EOF){
-//            System.out.println(t.lexeme + " " + t.type);
-//            t = lexer.getNextToken();
-//        }
+        CupLexer lexer = new CupLexer(cupFileContent);
         Parser parser = new Parser(lexer);
 
-            StatementNode list = parser.Parse();
-            list.EvaluateSemantic();
-//            String n = new GsonBuilder().setPrettyPrinting().create().toJson(list);
-            List<ProductionNode> f = new ArrayList<>();
-            f.addAll(((RootNode)list).productionList);
-
-            List<ProductionNode> f2 = new ArrayList<>(((RootNode)list).productionList);
-
-            List<AutomataNode> automata = AutomataService.GetAutomata(f);
-            List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
-            RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
-            String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
-            for(int i = 0; i < grammarLines.size(); i++)
-            {
-                GrammarLine temp = grammarLines.get(i);
-                System.out.printf("%d %s -> ",(i+1),temp.Producer);
-                for (String s : temp.Productions){
-                    System.out.print(s + " ");
-                }
-                System.out.println("");
+        StatementNode list = parser.Parse();
+        list.EvaluateSemantic();
+        List<ProductionNode> f = new ArrayList<>(((RootNode)list).productionList);
+        List<ProductionNode> f2 = new ArrayList<>(((RootNode)list).productionList);
+        List<AutomataNode> automata = AutomataService.GetAutomata(f);
+        List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
+        RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
+        String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
+        //Print Grammar
+        for(int i = 0; i < grammarLines.size(); i++)
+        {
+            GrammarLine temp = grammarLines.get(i);
+            System.out.printf("%d. %s -> ",(i+1),temp.Producer);
+            for (String s : temp.Productions){
+                System.out.print(s + " ");
             }
-            System.out.println(t);
-            System.out.println("SUCCESS!");
+            System.out.println("");
+        }
 
+        FileGenerationService.generateSymClass();
+        System.out.println(t);
+        System.out.println("SUCCESS!");
 
     }
 }
