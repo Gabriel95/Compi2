@@ -51,8 +51,17 @@ public class Main {
             List<AutomataNode> automata = AutomataService.GetAutomata(f);
             List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
             RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
-            String n = new GsonBuilder().setPrettyPrinting().create().toJson(table);
-            System.out.println(n);
+            String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
+            for(int i = 0; i < grammarLines.size(); i++)
+            {
+                GrammarLine temp = grammarLines.get(i);
+                System.out.printf("%d %s -> ",(i+1),temp.Producer);
+                for (String s : temp.Productions){
+                    System.out.print(s + " ");
+                }
+                System.out.println("");
+            }
+            System.out.println(t);
             System.out.println("SUCCESS!");
 
 

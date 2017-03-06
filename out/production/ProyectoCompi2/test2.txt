@@ -33,8 +33,8 @@ S ::= a S b S | a;
 */
 
 non terminal E, T, F;
-terminal a, b, OPEN, CLOSE, STAR, PLUS, ɛ;
+terminal a, b, OPEN, CLOSE, STAR, PLUS, e;
 
 E ::=  E PLUS T | T;
 T ::= T F | F;
-F ::= F STAR | OPEN E CLOSE | a | b | ɛ;
+F ::= F STAR | OPEN E CLOSE | a | b | e;
