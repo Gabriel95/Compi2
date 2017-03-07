@@ -2,6 +2,7 @@ import Automata.AutomataNode;
 import Automata.AutomataService;
 import Automata.GrammarLine;
 import Automata.GrammarService;
+import FileGeneration.FileGenerationService;
 import Lexer.*;
 import ParserPK.Parser;
 import Semantic.Nodes.Statements.ProductionNode;
@@ -12,7 +13,6 @@ import com.google.common.collect.RowSortedTable;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,8 @@ public class Main {
 
             cupFileContent = new String(data, "UTF-8");
         }
-        catch(Exception e){
+        catch(Exception e)
+        {
             System.out.print("error:" + e.getMessage());
         }
 
@@ -44,20 +45,21 @@ public class Main {
         List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2);
         RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
         String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
-        //Print Grammar
-        for(int i = 0; i < grammarLines.size(); i++)
-        {
-            GrammarLine temp = grammarLines.get(i);
-            System.out.printf("%d. %s -> ",(i+1),temp.Producer);
-            for (String s : temp.Productions){
-                System.out.print(s + " ");
-            }
-            System.out.println("");
-        }
-
         FileGenerationService.generateSymClass();
-        System.out.println(t);
-        System.out.println("SUCCESS!");
+        FileGenerationService.generateParser(table,grammarLines);
+
+        //Print Grammar
+//        for(int i = 0; i < grammarLines.size(); i++)
+//        {
+//            GrammarLine temp = grammarLines.get(i);
+//            System.out.printf("%d. %s -> ",(i+1),temp.Producer);
+//            for (String s : temp.Productions){
+//                System.out.print(s + " ");
+//            }
+//            System.out.println("");
+//        }
+//        System.out.println(t);
+//        System.out.println("SUCCESS!");
 
     }
 }

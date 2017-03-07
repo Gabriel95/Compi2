@@ -11,11 +11,12 @@ public class TestMain {
     public static void main(String args[]){
         try {
             Lex lex = new Lex(new FileReader("src//input.txt"));
-            try {
-                System.out.println(lex.yylex().getType());
-                System.out.println(lex.yylex().getType());
-                System.out.println(lex.yylex().getType());
-            } catch (IOException ex) {
+            try
+            {
+                parser p = new parser(lex);
+                p.parse();
+                System.out.println("Success!");
+            } catch (Exception ex) {
                 Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (FileNotFoundException ex) {

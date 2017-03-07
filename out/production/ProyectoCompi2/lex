@@ -29,16 +29,11 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 
     "a"                { return symbol(sym.a, yytext()); }
     "b"                { return symbol(sym.b, yytext()); }
-    "e"                { return symbol(sym.e, yytext()); }
-    "+"                { return symbol(sym.PLUS, yytext()); }
-    "("                { return symbol(sym.OPEN, yytext()); }
-    ")"                { return symbol(sym.CLOSE, yytext()); }
-    "*"                { return symbol(sym.STAR, yytext()); }
 
     {WhiteSpace}       { /* just skip what was found, do nothing */ }
 
 }
 
 
-[^]                    { throw new Error("Illegal character <"+yytext()+"> at line: " + yyline + " column: " + yycolumn); }
+[^]                    { throw new Error("Illegal character <"+yytext()+">"); }
 <<EOF>>                          { return symbol(sym.EOF); }

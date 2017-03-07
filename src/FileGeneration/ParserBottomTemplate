@@ -1,0 +1,56 @@
+}
+
+    public void parse() throws ParserException {
+        stack.push("0");
+        try
+        {
+            Symbol s = lexer.yylex();
+            while(s != null)
+            {
+                if(!table.contains(stack.peek(),sym.terminalNames[s.getType()]))
+                    throw new ParserException("Unexpected token at line: " + s.getYyline() + " column: " + s.getYycolumn());
+                String action = table.get(stack.peek(),sym.terminalNames[s.getType()]);
+                doAction(action);
+                if(stack.peek().equals("Accepted"))
+                    break;
+                if(next)
+                    s = lexer.yylex();
+            }
+
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void doAction(String action) throws ParserException {
+        char a = action.charAt(0);
+        if(action.equals("Accepted"))
+        {
+            stack.push(action);
+            next = true;
+            return;
+        }
+        switch (a)
+        {
+            case 'd':
+                stack.push(action.replace("d",""));
+                next = true;
+                break;
+            case 'r':
+                int r = Integer.parseInt(action.replace("r",""));
+                GrammarLine grammarLine = grammarLines.get(r - 1);
+                for(int i = 0; i < grammarLine.Productions.size(); i++)
+                {
+                    stack.pop();
+                }
+                if(!table.contains(stack.peek(),grammarLine.Producer))
+                    throw new ParserException("Unexpected token");
+                stack.push(table.get(stack.peek(),grammarLine.Producer));
+                next = false;
+                break;
+
+        }
+    }
+}

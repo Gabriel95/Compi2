@@ -29,6 +29,14 @@ public class Symbol {
         return value;
     }
 
+    public int getYyline() {
+        return yyline;
+    }
+
+    public int getYycolumn() {
+        return yycolumn;
+    }
+
     Symbol(int type, int yyline, int yycolumn, Object value) {
         this.type = type;
         this.yyline = yyline;
