@@ -2,6 +2,7 @@ package Automata;
 
 import Semantic.Types.NonTerminal;
 import Semantic.Types.SymbolTable;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.HashMap;

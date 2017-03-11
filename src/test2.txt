@@ -1,14 +1,16 @@
 import java_cup.runtime.*;
 
+/*
+java -jar jflex-1.6.1.jar lexer
 
-terminal PLUS, STAR, ID, OPEN, CLOSE,   ɛ;
+terminal PLUS, STAR, a, OPEN, CLOSE,   ɛ;
 non terminal e, e_prime, t, t_prime, f;
 
 e ::= e PLUS t | t;
 t ::= t STAR f | f;
-f ::= ID | OPEN e CLOSE;
+f ::=   OPEN e CLOSE | a;
 
-/*
+
 terminal a, b, d, ɛ;
 non terminal S, A, B, C, D, E;
 
@@ -25,4 +27,17 @@ non terminal S,C;
 
 S ::= C C;
 C ::= x C | d;
+
+non terminal S;
+terminal a, b;
+S ::= a S b S | a;
+
 */
+
+
+non terminal E, T, F;
+terminal a, b, OPEN, CLOSE, STAR, PLUS, e;
+
+E ::=  E PLUS T | T;
+T ::= T F | F;
+F ::= F STAR | OPEN E CLOSE | a | b | e;

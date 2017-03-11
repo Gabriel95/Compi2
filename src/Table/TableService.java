@@ -15,8 +15,7 @@ import java.util.Map;
  */
 public class TableService {
 
-    public static RowSortedTable<String, String, String> GetTable(List<AutomataNode> nodeList, List<GrammarLine> grammar)
-    {
+    public static RowSortedTable<String, String, String> GetTable(List<AutomataNode> nodeList, List<GrammarLine> grammar) throws TableException {
         RowSortedTable<String, String, String> toReturn = TreeBasedTable.create();
         for (AutomataNode node : nodeList) {
 
@@ -25,6 +24,8 @@ public class TableService {
                 Map.Entry pair = (Map.Entry) o;
                 String symbol = (String) pair.getKey();
                 AutomataNode aNode = (AutomataNode) pair.getValue();
+                if(toReturn.get(node.name.replace("I", ""),symbol) != null)
+                    throw new TableException("Ambiguos Grammar");
                 toReturn.put(node.name.replace("I", ""), symbol, "d" + aNode.name.replace("I", ""));
 
             }
@@ -34,6 +35,8 @@ public class TableService {
                 Map.Entry pair = (Map.Entry) o;
                 String symbol = (String) pair.getKey();
                 AutomataNode aNode = (AutomataNode) pair.getValue();
+                if(toReturn.get(node.name.replace("I", ""),symbol) != null)
+                    throw new TableException("Ambiguos Grammar");
                 toReturn.put(node.name.replace("I", ""), symbol, aNode.name.replace("I", ""));
 
             }
@@ -46,10 +49,14 @@ public class TableService {
                     {
                         if(nodeLine.Producer.equals("S_prime"))
                         {
+                            if(toReturn.get(node.name.replace("I", ""),f) != null)
+                                throw new TableException("Ambiguos Grammar");
                             toReturn.put(node.name.replace("I", ""),f, "Accepted");
                         }
                         else
                         {
+                            if(toReturn.get(node.name.replace("I", ""),f) != null)
+                                throw new TableException("Ambiguos Grammar");
                             toReturn.put(node.name.replace("I", ""),f, GrammarService.GetReduction(nodeLine,grammar));
                         }
                     }
