@@ -260,6 +260,10 @@ public class AutomataService {
                 NodeLine toAdd = new NodeLine(postDot);
                 toAdd.Production.addAll(production);
                 toAdd.F.addAll(F);
+                if(toAdd.Production.get(toAdd.dot).equals("ɛ"))
+                {
+                    toAdd.dot++;
+                }
                 closure.add(toAdd);
                 //TODO
                 if(toAdd.dot < toAdd.Production.size())
@@ -315,22 +319,6 @@ public class AutomataService {
                 }
             }
         }
-
-//        for (Object o : allLookUps.entrySet()) {
-//            Map.Entry pair = (Map.Entry) o;
-//            for(NodeLine line : closure)
-//            {
-//                if(line.Producer.equals(pair.getKey()))
-//                {
-//                    line.F.addAll((List<String>)pair.getValue());
-//                    Set<String> hs = new HashSet<>();
-//                    hs.addAll(line.F);
-//                    line.F.clear();
-//                    line.F.addAll(hs);
-//                }
-//            }
-//        }
-
         return closure;
     }
 
