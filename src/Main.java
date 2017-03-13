@@ -2,6 +2,7 @@ import Automata.AutomataNode;
 import Automata.AutomataService;
 import Automata.GrammarLine;
 import Automata.GrammarService;
+import FileGeneration.FileGenerationService;
 import Lexer.*;
 import ParserPK.Parser;
 import Semantic.Nodes.Statements.ProductionNode;
@@ -47,21 +48,21 @@ public class Main {
         List<GrammarLine> grammarLines = GrammarService.GetNonSimplifiedGrammarTable(f2,TypeTable);
         RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
         String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
-//        FileGenerationService.generateSymClass();
-//        FileGenerationService.generateParser(table,grammarLines);
+        FileGenerationService.generateSymClass();
+        FileGenerationService.generateParser(table,grammarLines);
 
         //Print Grammar
-        for(int i = 0; i < grammarLines.size(); i++)
-        {
-            GrammarLine temp = grammarLines.get(i);
-            System.out.printf("%d. %s -> ",(i+1),temp.Producer);
-            for (String s : temp.Productions){
-                System.out.print(s + " ");
-            }
-            System.out.println("");
-        }
-        System.out.println(t);
-        System.out.println("SUCCESS!");
+//        for(int i = 0; i < grammarLines.size(); i++)
+//        {
+//            GrammarLine temp = grammarLines.get(i);
+//            System.out.printf("%d. %s -> ",(i+1),temp.Producer);
+//            for (String s : temp.Productions){
+//                System.out.print(s + " ");
+//            }
+//            System.out.println("");
+//        }
+//        System.out.println(t);
+//        System.out.println("SUCCESS!");
 
     }
 }

@@ -180,12 +180,25 @@ public class GrammarService {
             for(RhsNode rhsNode : productionNode.RhsTokenList)
             {
                 List<String> toAdd = new ArrayList<>();
-                for(ProdPartNode prodPartNode : rhsNode.prodPartList)
+                List<Label> labelList = new ArrayList<>();
+                List<String> javaCodeList = new ArrayList<>();
+                for(int i = 0; i < rhsNode.prodPartList.size(); i++)
                 {
-                    if(prodPartNode.symbolIdNode != null)
-                        toAdd.add(prodPartNode.symbolIdNode.Name);
+                    if(rhsNode.prodPartList.get(i).symbolIdNode != null)
+                    {
+                        toAdd.add(rhsNode.prodPartList.get(i).symbolIdNode.Name);
+                        if(rhsNode.prodPartList.get(i).symbolIdNode.label != null)
+                        {
+                            labelList.add(new Label(rhsNode.prodPartList.get(i).symbolIdNode.label.Name,
+                                    typeTable.get(rhsNode.prodPartList.get(i).symbolIdNode.Name),i));
+                        }
+                    }
+                    else
+                    {
+                        javaCodeList.add(rhsNode.prodPartList.get(i).JavaCodeNode.Code);
+                    }
                 }
-                nonSimplifiedGrammarTable.add(new GrammarLine(productionNode.ntID.Name, toAdd));
+                nonSimplifiedGrammarTable.add(new GrammarLine(productionNode.ntID.Name, toAdd,labelList,javaCodeList));
             }
         }
         return nonSimplifiedGrammarTable;

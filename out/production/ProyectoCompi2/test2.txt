@@ -39,15 +39,18 @@ E ::=  T PLUS E | T;
 T ::= NUMBER | ID;
 
 non terminal E, T;
-terminal Integer num, PLUS;
-
-E ::= E:e PLUS T:t {:System.out.println(e + t);:}
-     | T : t {:RESULT = t;:};
-T ::= num:n {:RESULT = n;:};
-*/
-
-non terminal E, T;
 terminal PLUS, ID, OPEN, CLOSE;
 
 E ::=  T PLUS E | T;
 T ::= ID | OPEN E CLOSE;
+*/
+
+non terminal Integer E, T;
+non terminal S;
+terminal Integer num;
+terminal PLUS;
+
+S ::= E:e {:System.out.print(e);:};
+E ::= E:e PLUS T:t {:RESULT = e + t;:}
+     | T : t {:RESULT = t;:};
+T ::= num:n {:RESULT = n;:};

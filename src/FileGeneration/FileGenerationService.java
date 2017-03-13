@@ -1,5 +1,6 @@
 package FileGeneration;
 import Automata.GrammarLine;
+import Automata.Label;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 import com.google.common.collect.RowSortedTable;
@@ -100,6 +101,35 @@ public class FileGenerationService {
             sb.append(s);
         }
         sb.append(bottom);
+
+        //Creating Reduction Cases
+        for(int i = 0; i < grammarLines.size(); i++)
+        {
+            String s = "\n\t\t\tcase " + (i + 1) + ":\n\t\t\t{";
+            for (Label lable : grammarLines.get(i).labelList)
+            {
+                s = s + "\n\t\t\t\t" + lable.Type + " " + lable.Name + ";" ;
+            }
+
+            for (Label lable : grammarLines.get(i).labelList)
+            {
+                s = s + "\n\t\t\t\t" + lable.Name + " = ";
+                if(!lable.Type.equals("Object"))
+                {
+                    s = s + "(" + lable.Type + ") ";
+                }
+                s = s + "stack.elementAt(stack.size() - " + (2 * (grammarLines.get(i).Productions.size() - lable.position)) + ");";
+            }
+            s = s + "\n\t\t\t\tPopStack(magnitude);";
+
+            for(String javaCode : grammarLines.get(i).javaCodeList)
+            {
+                s = s + "\n\t\t\t\t" + javaCode;
+            }
+            s = s + "\n\t\t\t\tstack.push(RESULT);\n\t\t\t\treturn;\n\t\t\t}";
+            sb.append(s);
+        }
+        sb.append("\n\t\t\tdefault:\n\t\t\t\treturn;\n\t\t}\n\t}\n}");
         writeToFile("parser.java",sb.toString());
     }
 
