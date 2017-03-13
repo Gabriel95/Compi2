@@ -21,21 +21,15 @@
 LineTerminator = \r|\n|\r\n
 
 WhiteSpace     = {LineTerminator} | [ \t\f]
-
+dec_int_lit = 0 | [1-9][0-9]*
 
 %%
 
 <YYINITIAL> {
 
-    "a"                { return symbol(sym.a, yytext()); }
-    "b"                { return symbol(sym.b, yytext()); }
-    "e"                { return symbol(sym.e, yytext()); }
     "+"                { return symbol(sym.PLUS, yytext()); }
-    "("                { return symbol(sym.OPEN, yytext()); }
-    ")"                { return symbol(sym.CLOSE, yytext()); }
-    "*"                { return symbol(sym.STAR, yytext()); }
-
     {WhiteSpace}       { /* just skip what was found, do nothing */ }
+    {dec_int_lit}       {return symbol(sym.num, Integer.parseInt(yytext())); }
 
 }
 

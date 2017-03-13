@@ -1,8 +1,11 @@
 package Automata;
 
+import Semantic.Nodes.Expression.DeclarationTypeNode;
+import Semantic.Nodes.Expression.IdNode;
 import Semantic.Nodes.Expression.ProdPartNode;
 import Semantic.Nodes.Expression.RhsNode;
 import Semantic.Nodes.Statements.ProductionNode;
+import Semantic.Nodes.Statements.SymbolNode;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 
@@ -169,7 +172,7 @@ public class GrammarService {
         return followList;
     }
 
-    public static List<GrammarLine> GetNonSimplifiedGrammarTable(List<ProductionNode> productionNodeList)
+    public static List<GrammarLine> GetNonSimplifiedGrammarTable(List<ProductionNode> productionNodeList, Map<String, String> typeTable)
     {
         List<GrammarLine> nonSimplifiedGrammarTable = new ArrayList<>();
         for(ProductionNode productionNode : productionNodeList)
@@ -188,7 +191,6 @@ public class GrammarService {
         return nonSimplifiedGrammarTable;
     }
 
-
     public static String GetReduction(NodeLine nodeLine, List<GrammarLine> grammar)
     {
         for(int i = 0; i < grammar.size(); i++)
@@ -199,5 +201,24 @@ public class GrammarService {
             }
         }
         return null;
+    }
+
+    public static Map<String,String> GetTypeTable(List<SymbolNode> symbolList)
+    {
+        Map<String,String> TypeTable= new HashMap<>();
+        for (SymbolNode symbolNode: symbolList) {
+            for(IdNode idNode : symbolNode.declarationList)
+            {
+                if (symbolNode.className != null)
+                {
+                    TypeTable.put(idNode.Name,symbolNode.className.getName());
+                }
+                else
+                {
+                    TypeTable.put(idNode.Name,"Object");
+                }
+            }
+        }
+        return TypeTable;
     }
 }

@@ -32,12 +32,22 @@ non terminal S;
 terminal a, b;
 S ::= a S b S | a;
 
+non terminal E, T;
+terminal PLUS, ID, NUMBER;
+
+E ::=  T PLUS E | T;
+T ::= NUMBER | ID;
+
+non terminal E, T;
+terminal PLUS, ID, OPEN, CLOSE;
+
+E ::=  T PLUS E | T;
+T ::= ID | OPEN E CLOSE;
 */
 
+non terminal E, T;
+terminal Integer num, PLUS;
 
-non terminal E, T, F;
-terminal a, b, OPEN, CLOSE, STAR, PLUS, e;
-
-E ::=  E PLUS T | T;
-T ::= T F | F;
-F ::= F STAR | OPEN E CLOSE | a | b | e;
+E ::= E:e PLUS T:t {:System.out.println(e + t);:}
+     | T : t {:RESULT = t;:};
+T ::= num:n {:RESULT = n;:};

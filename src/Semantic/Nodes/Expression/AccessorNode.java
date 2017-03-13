@@ -12,4 +12,10 @@ public abstract class AccessorNode extends ExpressionNode{
     public void EvaluateSemantic() {
         //System.out.println("Not Implemented");
     }
+
+    public String getName() {
+        if(IdNode instanceof DeclarationTypeNode)
+            return ((DeclarationTypeNode)IdNode).getName();
+        return IdNode.Name;
+    }
 }
