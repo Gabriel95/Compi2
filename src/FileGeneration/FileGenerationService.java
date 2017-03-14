@@ -1,6 +1,7 @@
 package FileGeneration;
 import Automata.GrammarLine;
 import Automata.Label;
+import Semantic.Nodes.Expression.ImportIdNode;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 import com.google.common.collect.RowSortedTable;
@@ -48,11 +49,15 @@ public class FileGenerationService {
         writeToFile("sym.java",sb.toString());
     }
 
-    public static void generateParser(RowSortedTable<String, String, String> table, List<GrammarLine> grammarLines)
+    public static void generateParser(RowSortedTable<String, String, String> table, List<GrammarLine> grammarLines, List<ImportIdNode> imports)
     {
         String top = "";
         String bottom = "";
         StringBuilder sb = new StringBuilder();
+        for (ImportIdNode importIdNode : imports)
+        {
+            sb.append("import " + importIdNode.getName() + "\n");
+        }
         try
         {
             File file = new File("src//FileGeneration//ParserTopTemplate");

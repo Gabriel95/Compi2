@@ -5,6 +5,7 @@ import Automata.GrammarService;
 import FileGeneration.FileGenerationService;
 import Lexer.*;
 import ParserPK.Parser;
+import Semantic.Nodes.Expression.ImportIdNode;
 import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Nodes.Statements.RootNode;
 import Semantic.Nodes.Statements.StatementNode;
@@ -42,6 +43,7 @@ public class Main {
         list.EvaluateSemantic();
         List<ProductionNode> f = new ArrayList<>(((RootNode)list).productionList);
         List<ProductionNode> f2 = new ArrayList<>(((RootNode)list).productionList);
+        List<ImportIdNode> imports = new ArrayList<>(((RootNode)list).importList);
         List<SymbolNode> symbolList = new ArrayList<>(((RootNode)list).symbolList);
         Map<String,String> TypeTable= GrammarService.GetTypeTable(symbolList);
         List<AutomataNode> automata = AutomataService.GetAutomata(f);
@@ -49,7 +51,7 @@ public class Main {
         RowSortedTable<String, String, String> table =  TableService.GetTable(automata,grammarLines);
         String t = new GsonBuilder().setPrettyPrinting().create().toJson(table);
         FileGenerationService.generateSymClass();
-        FileGenerationService.generateParser(table,grammarLines);
+        FileGenerationService.generateParser(table,grammarLines,imports);
 
         //Print Grammar
 //        for(int i = 0; i < grammarLines.size(); i++)

@@ -16,6 +16,12 @@ public abstract class AccessorNode extends ExpressionNode{
     public String getName() {
         if(IdNode instanceof DeclarationTypeNode)
             return ((DeclarationTypeNode)IdNode).getName();
+        if(IdNode instanceof ImportIdNode)
+            return ((ImportIdNode)IdNode).getName();
+        if(IdNode instanceof NormalIdNode)
+            return ((NormalIdNode)IdNode).getName();
+        if(IdNode instanceof StarId)
+            return "*";
         return IdNode.Name;
     }
 }

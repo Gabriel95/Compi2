@@ -28,11 +28,14 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
 
 <YYINITIAL> {
 
-    "+"                { return symbol(sym.PLUS, yytext()); }
-    "("                { return symbol(sym.OPEN, yytext()); }
+    "a"                { return symbol(sym.a, yytext()); }
+    "b"                { return symbol(sym.b, yytext()); }
+    "e"                { return symbol(sym.e, yytext()); }
+    "+"                { return symbol(sym.PLUS,  yytext()); }
+    "("                { return symbol(sym.OPEN,  yytext()); }
     ")"                { return symbol(sym.CLOSE, yytext()); }
+    "*"                { return symbol(sym.STAR,  yytext()); }
     {WhiteSpace}       { /* just skip what was found, do nothing */ }
-    {dec_int_id}       {return symbol(sym.ID, yytext()); }
 
 }
 
