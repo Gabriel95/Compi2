@@ -225,7 +225,7 @@ public class AutomataService {
                 }
             }
         }
-        return automataNode;
+        return MinimizeNode(automataNode);
     }
 
     private static AutomataNode CreateRootNode(List<ProductionNode> productionNodeList, Map<String, List<RhsNode>> firstTable) throws Exception
@@ -244,7 +244,7 @@ public class AutomataService {
             automataNode.lineCollection.addAll(closure);
         }
 
-        return automataNode;
+        return MinimizeNode(automataNode);
     }
 
     private static List<NodeLine> GetClosure(NodeLine nodeLine, Map<String, List<List<String>>> grammarTable, Map<String, List<RhsNode>> rhsGrammarTable) throws Exception
@@ -358,5 +358,43 @@ public class AutomataService {
         F.clear();
         F.addAll(hs);
         return F;
+    }
+
+    private static AutomataNode MinimizeNode(AutomataNode toMinimize)
+    {
+        List<Integer> doNotEvaluate = new ArrayList<>();
+        List<NodeLine> lines = new ArrayList<>();
+        for(int i = 0; i < toMinimize.lineCollection.size(); i++)
+        {
+            for(int j = 0; j < toMinimize.lineCollection.size(); j++)
+            {
+                if(i != j && !doNotEvaluate.contains(i))
+                {
+                    List<String> temp1 = new ArrayList<>(toMinimize.lineCollection.get(i).Production);
+                    List<String> temp2 = new ArrayList<>(toMinimize.lineCollection.get(j).Production);
+
+                    Collections.sort(temp1);
+                    Collections.sort(temp2);
+                    if(temp1.equals(temp2) && toMinimize.lineCollection.get(i).dot == toMinimize.lineCollection.get(j).dot)
+                    {
+                        toMinimize.lineCollection.get(i).F.addAll(toMinimize.lineCollection.get(j).F);
+                        Set<String> hs = new HashSet<>();
+                        hs.addAll(toMinimize.lineCollection.get(i).F);
+                        toMinimize.lineCollection.get(i).F.clear();
+                        toMinimize.lineCollection.get(i).F.addAll(hs);
+                        doNotEvaluate.add(j);
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < toMinimize.lineCollection.size(); i++)
+        {
+            if(!doNotEvaluate.contains(i))
+            {
+                lines.add(toMinimize.lineCollection.get(i));
+            }
+        }
+        toMinimize.lineCollection = lines;
+        return toMinimize;
     }
 }

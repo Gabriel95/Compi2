@@ -1,5 +1,3 @@
-import java_cup.runtime.*;
-
 /*
 java -jar jflex-1.6.1.jar lexer
 
@@ -34,6 +32,30 @@ terminal PLUS, ID, NUMBER;
 E ::=  T PLUS E | T;
 T ::= NUMBER | ID;
 
+non terminal E, T;
+terminal PLUS, ID, OPEN, CLOSE;
+
+E ::=  T PLUS E | T;
+T ::= ID | OPEN E CLOSE;
+
+non terminal S;
+terminal a, b;
+
+S ::= a S b S | a;
+
+non terminal E,T,F;
+terminal STAR, PLUS, OPEN, CLOSE, num;
+
+E ::= T PLUS E | T;
+T ::= F STAR T | F;
+F ::= num | OPEN E CLOSE;
+
+non terminal S;
+terminal a, b;
+
+S ::= a S b S | a;
+*/
+
 non terminal Integer E, T, F;
 non terminal S;
 terminal Integer num;
@@ -48,22 +70,3 @@ T ::= T:t MUL F:f {:RESULT = t * f;:}
      |F:f {:RESULT = f;:};
 F ::= num:n{:RESULT = n;:}
      |OPEN E:e CLOSE {:RESULT = e:};
-
-non terminal E, T;
-terminal PLUS, ID, OPEN, CLOSE;
-
-E ::=  T PLUS E | T;
-T ::= ID | OPEN E CLOSE;
-
-non terminal S;
-terminal a, b;
-
-S ::= a S b S | a;
-
-*/
-non terminal E, T, F;
-terminal a, b, PLUS, OPEN, CLOSE, e, STAR;
-
-E ::= E PLUS T | T;
-T ::= T F | F;
-F ::= F STAR | OPEN E CLOSE | a | b | e;

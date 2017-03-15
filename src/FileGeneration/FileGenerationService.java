@@ -56,7 +56,7 @@ public class FileGenerationService {
         StringBuilder sb = new StringBuilder();
         for (ImportIdNode importIdNode : imports)
         {
-            sb.append("import " + importIdNode.getName() + "\n");
+            sb.append("import " + importIdNode.getName() + ";\n");
         }
         try
         {
