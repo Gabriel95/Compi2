@@ -1,9 +1,6 @@
 package Automata;
 
-import Semantic.Nodes.Expression.DeclarationTypeNode;
-import Semantic.Nodes.Expression.IdNode;
-import Semantic.Nodes.Expression.ProdPartNode;
-import Semantic.Nodes.Expression.RhsNode;
+import Semantic.Nodes.Expression.*;
 import Semantic.Nodes.Statements.ProductionNode;
 import Semantic.Nodes.Statements.SymbolNode;
 import Semantic.Types.SymbolTable;
@@ -187,7 +184,18 @@ public class GrammarService {
                     if(rhsNode.prodPartList.get(i).symbolIdNode != null)
                     {
                         toAdd.add(rhsNode.prodPartList.get(i).symbolIdNode.Name);
-                        if(rhsNode.prodPartList.get(i).symbolIdNode.label != null)
+                        if(rhsNode instanceof GhostRhsNode)
+                        {
+                            for(int j = 0; j < ((GhostRhsNode)rhsNode).ghostList.size(); j++)
+                            {
+                                if(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.label != null)
+                                {
+                                    labelList.add(new Label(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.label.Name,
+                                            typeTable.get(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.Name),j));
+                                }
+                            }
+                        }
+                        else if(rhsNode.prodPartList.get(i).symbolIdNode.label != null)
                         {
                             labelList.add(new Label(rhsNode.prodPartList.get(i).symbolIdNode.label.Name,
                                     typeTable.get(rhsNode.prodPartList.get(i).symbolIdNode.Name),i));

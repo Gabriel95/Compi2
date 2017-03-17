@@ -26,7 +26,7 @@ public class FileGenerationService {
         for (Object o : SymbolTable.Instance().variables.entrySet())
         {
             Map.Entry pair = (Map.Entry) o;
-            if(pair.getValue() instanceof Terminal)
+            if(pair.getValue() instanceof Terminal && !pair.getKey().equals("ɛ"))
             {
                 sb.append(variableDeclaration + pair.getKey() + " = " + count + ";\n");
                 count++;
@@ -38,7 +38,7 @@ public class FileGenerationService {
         for (Object o : SymbolTable.Instance().variables.entrySet())
         {
             Map.Entry pair = (Map.Entry) o;
-            if(pair.getValue() instanceof Terminal)
+            if(pair.getValue() instanceof Terminal && !pair.getKey().equals("ɛ"))
             {
                 sb.append(prefix);
                 prefix = ",\n";

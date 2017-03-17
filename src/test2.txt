@@ -55,32 +55,19 @@ terminal a, b;
 
 S ::= a S b S | a;
 
+*/
+
 non terminal Integer E, T, F;
 non terminal S;
 terminal Integer num;
-terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE;
+terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE,ɛ;
 
 S ::= E:e {:System.out.println(e);:};
-E ::= E:e {:System.out.println(e);:} PLUS T:t {:RESULT = e + t;:}
+E ::= E:e {:System.out.println(t);:} PLUS T:t {:RESULT = e + t;:}
      | E:e MINUS T:t {:RESULT = e - t;:}
      | T : t {:RESULT = t;:};
 T ::= T:t MUL F:f {:RESULT = t * f;:}
      |T:t DIV F:f {:RESULT = t / f;:}
      |F:f {:RESULT = f;:};
 F ::= num:n{:RESULT = n;:}
-     |OPEN E:e CLOSE {:RESULT = e:};
-*/
-
-non terminal Integer E, T, F, PRIME;
-non terminal S;
-terminal Integer num;
-terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE,ɛ;
-
-S ::= E:e;
-E ::= E:e PRIME PLUS T:t
-     | T : t;
-PRIME ::= ɛ;
-T ::= T:t MUL F:f
-     |F:f;
-F ::= num:n
-     |OPEN E:e CLOSE;
+     |OPEN E:e CLOSE {:RESULT = e;:};

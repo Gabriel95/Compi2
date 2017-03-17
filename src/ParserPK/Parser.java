@@ -1,4 +1,5 @@
 package ParserPK;
+import Automata.LabelFactory;
 import Lexer.CupLexer;
 import Semantic.Nodes.*;
 import Semantic.Nodes.Expression.*;
@@ -48,9 +49,56 @@ public class Parser {
         toReturn.importList = import_list();
         toReturn.codeParts = code_parts();
         toReturn.symbolList = symbol_list();
-//        presedence_list();
-//        start_spec();
         toReturn.productionList = production_list();
+        return RemoveEmbeddedActions(toReturn);
+    }
+
+    private RootNode RemoveEmbeddedActions(RootNode toReturn) {
+        List<ProductionNode> toAdd = new ArrayList<>();
+        for(ProductionNode prod : toReturn.productionList)
+        {
+            for(RhsNode rhsNode : prod.RhsTokenList)
+            {
+                for (int i = 0; i < rhsNode.prodPartList.size()-1; i++)
+                {
+                    if(rhsNode.prodPartList.get(i).JavaCodeNode!=null)
+                    {
+                        SymbolNode nonTerm = new NonTerminalSymbolNode();
+                        NonTerminalIdNode idNonTerm = new NonTerminalIdNode();
+                        String sName = LabelFactory.createLabel("$GHOST");
+                        idNonTerm.Name = sName;
+                        nonTerm.declarationList = new ArrayList<>();
+                        nonTerm.declarationList.add(idNonTerm);
+                        toReturn.symbolList.add(nonTerm);
+
+                        ProductionNode newP = new ProductionNode();
+                        newP.ntID = idNonTerm;
+
+                        GhostRhsNode newRHS = new GhostRhsNode();
+                        newRHS.ghostList = new ArrayList<>();
+                        ProdPartNode eProd = new ProdPartNode();
+                        eProd.symbolIdNode = new SymbolIdNode();
+                        eProd.symbolIdNode.Name = "ɛ";
+                        newRHS.prodPartList = new ArrayList<>();
+                        newRHS.prodPartList.add(eProd);
+                        newRHS.prodPartList.add(rhsNode.prodPartList.get(i));
+                        rhsNode.prodPartList.remove(i);
+                        for(int j = 0; j < i; j++)
+                        {
+                            newRHS.ghostList.add(rhsNode.prodPartList.get(j));
+                        }
+                        ProdPartNode ghostPart = new ProdPartNode();
+                        ghostPart.symbolIdNode = new SymbolIdNode();
+                        ghostPart.symbolIdNode.Name = sName;
+                        rhsNode.prodPartList.add(i,ghostPart);
+                        newP.RhsTokenList = new ArrayList<>();
+                        newP.RhsTokenList.add(newRHS);
+                        toAdd.add(newP);
+                    }
+                }
+            }
+        }
+        toReturn.productionList.addAll(toAdd);
         return toReturn;
     }
 

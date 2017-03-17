@@ -42,7 +42,12 @@
             case 'r':
                 int r = Integer.parseInt(action.replace("r",""));
                 GrammarLine grammarLine = grammarLines.get(r - 1);
-                DoReduction(r, grammarLine.Productions.size());
+                int magnitude = 0;
+                if(grammarLine.Productions.size() > 1)
+                    magnitude = grammarLine.Productions.size();
+                else if(!grammarLine.Productions.get(0).equals("ɛ"))
+                    magnitude = 1;
+                DoReduction(r, magnitude);
                 if(!table.contains(stack.elementAt(stack.size()-2),grammarLine.Producer))
                     throw new ParserException("Unexpected token");
                 stack.push(table.get(stack.elementAt(stack.size()-2),grammarLine.Producer));
