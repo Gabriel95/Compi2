@@ -30,7 +30,6 @@ public class FileGenerationService {
             {
                 sb.append(variableDeclaration + pair.getKey() + " = " + count + ";\n");
                 count++;
-
             }
         }
         sb.append(terminals);

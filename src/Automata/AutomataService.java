@@ -320,6 +320,16 @@ public class AutomataService {
                 }
             }
         }
+        for (NodeLine nodeline : closure) {
+            if(allLookUps.containsKey(nodeline.Producer))
+            {
+                nodeline.F.addAll(allLookUps.get(nodeline.Producer));
+                Set<String> hs = new HashSet<>();
+                hs.addAll(nodeline.F);
+                nodeline.F.clear();
+                nodeline.F.addAll(hs);
+            }
+        }
         return closure;
     }
 

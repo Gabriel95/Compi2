@@ -1,6 +1,6 @@
  }
 
-    public void parse() throws ParserException {
+    public Object parse() throws ParserException {
         stack.push("0");
         try
         {
@@ -12,16 +12,19 @@
                 String action = table.get(stack.peek(),sym.terminalNames[s.getType()]);
                 doAction(action,s.getValue());
                 if(stack.peek().equals("Accepted"))
-                    break;
+                {
+                    return stack.elementAt(stack.size()-2);
+                }
                 if(next)
                     s = lexer.yylex();
             }
-
+            throw new ParserException("Expected EOF");
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+        throw new ParserException("Expected EOF");
     }
 
     private void doAction(String action, Object value) throws ParserException {

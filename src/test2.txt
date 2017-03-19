@@ -55,8 +55,6 @@ terminal a, b;
 
 S ::= a S b S | a;
 
-*/
-
 non terminal Integer E, T, F;
 non terminal S;
 terminal Integer num;
@@ -71,3 +69,23 @@ T ::= T:t MUL F:f {:RESULT = t * f;:}
      |F:f {:RESULT = f;:};
 F ::= num:n{:RESULT = n;:}
      |OPEN E:e CLOSE {:RESULT = e;:};
+*/
+
+terminal           SEMI, PLUS, MINUS, MUL, DIV, OPEN, CLOSE,ɛ;
+terminal Integer   NUMBER;
+terminal           EQUALS;
+terminal String    ID;
+non terminal E, EQUATION_LIST, EQUATION, T, F;
+
+    EQUATION_LIST ::= EQUATION EQUATION_LIST  | ɛ;
+
+    EQUATION ::= E EQUALS E SEMI;
+
+    E ::= T | E MINUS T | E PLUS T;
+
+    T ::= F
+        | T DIV F
+        | T MUL F;
+
+    F ::= NUMBER
+        | OPEN E CLOSE;
