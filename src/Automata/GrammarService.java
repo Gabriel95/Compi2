@@ -216,7 +216,7 @@ public class GrammarService {
     {
         for(int i = 0; i < grammar.size(); i++)
         {
-            if(nodeLine.Production.equals(grammar.get(i).Productions))
+            if(nodeLine.Production.equals(grammar.get(i).Productions) && grammar.get(i).Producer.equals(nodeLine.Producer))
             {
                 return "r" + (i + 1);
             }

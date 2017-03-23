@@ -13,7 +13,7 @@
                 doAction(action,s.getValue());
                 if(stack.peek().equals("Accepted"))
                 {
-                    return stack.elementAt(stack.size()-2);
+                    return stack.elementAt(stack.size()-3);
                 }
                 if(next)
                     s = lexer.yylex();

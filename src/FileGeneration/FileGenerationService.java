@@ -125,7 +125,8 @@ public class FileGenerationService {
                 s = s + "stack.elementAt(stack.size() - " + (2 * (grammarLines.get(i).Productions.size() - lable.position)) + ");";
             }
             s = s + "\n\t\t\t\tPopStack(magnitude);";
-            //Trauccion Dirigida Code
+
+            //Traduccion Dirigida Code
             for(String javaCode : grammarLines.get(i).javaCodeList)
             {
                 s = s + "\n\t\t\t\t" + javaCode;

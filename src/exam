@@ -1,0 +1,41 @@
+import tree.expression.*;
+import tree.statement.*;
+terminal String ID;
+terminal Integer NUM;
+terminal  EQUAL, GOTO, COLON, IF, READ, PRINT, PLUS, MINUS, MUL, DIV, EQ, NEQ, GT, LT, GE, LE, ɛ;
+non terminal NumberNode const;
+non terminal IdNode var, label;
+non terminal StatementNode statement;
+non terminal List<StatementNode> statementList;
+non terminal ExpressionNode expr, varConst, boolExpr;
+
+statementList ::= statement:s statementList:sL {: sL.add(0,s); RESULT = sL; :}
+                  |ɛ{:List<StatementNode> nodeList = new ArrayList<StatementNode>(); RESULT = nodeList; :};
+
+statement ::=  var : v EQUAL expr:e {: RESULT = new AssignNode(e,v); :}
+             | GOTO label:l {: RESULT = new GoToLabel(l); :}
+             | label:l COLON {: RESULT = new LabelNode(l); :}
+             | IF boolExpr:b GOTO label:l {: RESULT = new IfNode(b,l); :}
+             | READ var:v {: RESULT = new ScanNode(v); :}
+             | PRINT var:v {: RESULT = new PrintNode(v); :};
+
+expr ::=    varConst:vC {: RESULT = vC; :}
+          | varConst:vC1 PLUS varConst:vC2 {: RESULT = new SumNode(vC2,vC1); :}
+          | varConst:vC1 MINUS varConst:vC2 {: RESULT = new SubNode(vC2,vC1); :}
+          | varConst:vC1 MUL varConst:vC2 {: RESULT = new MultNode(vC2,vC1); :}
+          | varConst:vC1 DIV varConst:vC2 {: RESULT = new DivNode(vC2,vC1); :};
+
+boolExpr ::=  varConst:l EQ varConst:r1 {: RESULT = new EqualsNode(r1,l); :}
+            | varConst:l NEQ varConst:r1 {: RESULT = new NotEqualsNode(r1,l); :}
+            | varConst:l GT varConst:r1 {: RESULT = new GreaterThanNode(r1,l); :}
+            | varConst:l LT varConst:r1 {: RESULT = new LessThanNode(r1,l); :}
+            | varConst:l GE varConst:r1 {: RESULT = new GreaterOrEqualsThanNode(r1,l); :}
+            | varConst:l LE varConst:r1 {: RESULT = new LessOrEqualsThanNode(r1,l); :};
+
+varConst ::= var : v {: RESULT = v; :}| const : c {: RESULT = c; :};
+
+var ::= ID:id {: RESULT = new IdNode(id); :};
+
+label ::= ID:id {: RESULT = new IdNode(id); :};
+
+const ::= NUM : n {: RESULT = new NumberNode(n); :};

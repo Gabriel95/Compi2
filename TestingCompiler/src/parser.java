@@ -36,127 +36,99 @@ public class parser {
         grammarLines = new ArrayList<>();
         stack = new Stack();
         this.lexer = lexer;
-		table.put("0", "$", "r2");
-		table.put("0", "E", "3");
-		table.put("0", "EQUATION", "2");
-		table.put("0", "EQUATION_LIST", "1");
-		table.put("0", "F", "5");
-		table.put("0", "NUMBER", "d6");
-		table.put("0", "OPEN", "d7");
-		table.put("0", "T", "4");
+		table.put("0", "E", "2");
+		table.put("0", "F", "4");
+		table.put("0", "OPEN", "d6");
+		table.put("0", "S", "1");
+		table.put("0", "T", "3");
+		table.put("0", "num", "d5");
 		table.put("1", "$", "Accepted");
-		table.put("10", "F", "5");
-		table.put("10", "NUMBER", "d6");
-		table.put("10", "OPEN", "d7");
-		table.put("10", "T", "16");
-		table.put("11", "F", "5");
-		table.put("11", "NUMBER", "d6");
-		table.put("11", "OPEN", "d7");
-		table.put("11", "T", "17");
-		table.put("12", "F", "18");
-		table.put("12", "NUMBER", "d6");
-		table.put("12", "OPEN", "d7");
-		table.put("13", "F", "19");
-		table.put("13", "NUMBER", "d6");
-		table.put("13", "OPEN", "d7");
-		table.put("14", "CLOSE", "d20");
-		table.put("14", "MINUS", "d10");
-		table.put("14", "PLUS", "d11");
-		table.put("15", "MINUS", "d10");
-		table.put("15", "PLUS", "d11");
-		table.put("15", "SEMI", "d21");
-		table.put("16", "CLOSE", "r5");
-		table.put("16", "DIV", "d12");
-		table.put("16", "EQUALS", "r5");
-		table.put("16", "MINUS", "r5");
-		table.put("16", "MUL", "d13");
-		table.put("16", "PLUS", "r5");
-		table.put("16", "SEMI", "r5");
-		table.put("17", "CLOSE", "r6");
-		table.put("17", "DIV", "d12");
-		table.put("17", "EQUALS", "r6");
-		table.put("17", "MINUS", "r6");
-		table.put("17", "MUL", "d13");
-		table.put("17", "PLUS", "r6");
-		table.put("17", "SEMI", "r6");
-		table.put("18", "CLOSE", "r8");
-		table.put("18", "DIV", "r8");
-		table.put("18", "EQUALS", "r8");
-		table.put("18", "MINUS", "r8");
-		table.put("18", "MUL", "r8");
-		table.put("18", "PLUS", "r8");
-		table.put("18", "SEMI", "r8");
-		table.put("19", "CLOSE", "r9");
-		table.put("19", "DIV", "r9");
-		table.put("19", "EQUALS", "r9");
-		table.put("19", "MINUS", "r9");
-		table.put("19", "MUL", "r9");
-		table.put("19", "PLUS", "r9");
-		table.put("19", "SEMI", "r9");
-		table.put("2", "$", "r2");
-		table.put("2", "E", "3");
-		table.put("2", "EQUATION", "2");
-		table.put("2", "EQUATION_LIST", "8");
-		table.put("2", "F", "5");
-		table.put("2", "NUMBER", "d6");
-		table.put("2", "OPEN", "d7");
-		table.put("2", "T", "4");
-		table.put("20", "CLOSE", "r11");
-		table.put("20", "DIV", "r11");
-		table.put("20", "EQUALS", "r11");
-		table.put("20", "MINUS", "r11");
-		table.put("20", "MUL", "r11");
-		table.put("20", "PLUS", "r11");
-		table.put("20", "SEMI", "r11");
-		table.put("21", "$", "r3");
-		table.put("21", "NUMBER", "r3");
-		table.put("21", "OPEN", "r3");
-		table.put("3", "EQUALS", "d9");
-		table.put("3", "MINUS", "d10");
-		table.put("3", "PLUS", "d11");
-		table.put("4", "CLOSE", "r4");
-		table.put("4", "DIV", "d12");
-		table.put("4", "EQUALS", "r4");
-		table.put("4", "MINUS", "r4");
-		table.put("4", "MUL", "d13");
-		table.put("4", "PLUS", "r4");
-		table.put("4", "SEMI", "r4");
-		table.put("5", "CLOSE", "r7");
-		table.put("5", "DIV", "r7");
-		table.put("5", "EQUALS", "r7");
-		table.put("5", "MINUS", "r7");
-		table.put("5", "MUL", "r7");
-		table.put("5", "PLUS", "r7");
-		table.put("5", "SEMI", "r7");
-		table.put("6", "CLOSE", "r10");
-		table.put("6", "DIV", "r10");
-		table.put("6", "EQUALS", "r10");
-		table.put("6", "MINUS", "r10");
-		table.put("6", "MUL", "r10");
-		table.put("6", "PLUS", "r10");
-		table.put("6", "SEMI", "r10");
-		table.put("7", "E", "14");
-		table.put("7", "F", "5");
-		table.put("7", "NUMBER", "d6");
-		table.put("7", "OPEN", "d7");
-		table.put("7", "T", "4");
-		table.put("8", "$", "r1");
-		table.put("9", "E", "15");
-		table.put("9", "F", "5");
-		table.put("9", "NUMBER", "d6");
-		table.put("9", "OPEN", "d7");
-		table.put("9", "T", "4");
-		grammarLines.add(new GrammarLine("EQUATION_LIST",new ArrayList<>(Arrays.asList("EQUATION", "EQUATION_LIST"))));
-		grammarLines.add(new GrammarLine("EQUATION_LIST",new ArrayList<>(Arrays.asList("ɛ"))));
-		grammarLines.add(new GrammarLine("EQUATION",new ArrayList<>(Arrays.asList("E", "EQUALS", "E", "SEMI"))));
-		grammarLines.add(new GrammarLine("E",new ArrayList<>(Arrays.asList("T"))));
+		table.put("10", "F", "15");
+		table.put("10", "OPEN", "d6");
+		table.put("10", "num", "d5");
+		table.put("11", "$GHOST1", "7");
+		table.put("11", "CLOSE", "d16");
+		table.put("11", "MINUS", "d8");
+		table.put("11", "PLUS", "r10");
+		table.put("12", "F", "4");
+		table.put("12", "OPEN", "d6");
+		table.put("12", "T", "17");
+		table.put("12", "num", "d5");
+		table.put("13", "$", "r3");
+		table.put("13", "CLOSE", "r3");
+		table.put("13", "DIV", "d10");
+		table.put("13", "MINUS", "r3");
+		table.put("13", "MUL", "d9");
+		table.put("13", "PLUS", "r3");
+		table.put("14", "$", "r5");
+		table.put("14", "CLOSE", "r5");
+		table.put("14", "DIV", "r5");
+		table.put("14", "MINUS", "r5");
+		table.put("14", "MUL", "r5");
+		table.put("14", "PLUS", "r5");
+		table.put("15", "$", "r6");
+		table.put("15", "CLOSE", "r6");
+		table.put("15", "DIV", "r6");
+		table.put("15", "MINUS", "r6");
+		table.put("15", "MUL", "r6");
+		table.put("15", "PLUS", "r6");
+		table.put("16", "$", "r9");
+		table.put("16", "CLOSE", "r9");
+		table.put("16", "DIV", "r9");
+		table.put("16", "MINUS", "r9");
+		table.put("16", "MUL", "r9");
+		table.put("16", "PLUS", "r9");
+		table.put("17", "$", "r2");
+		table.put("17", "CLOSE", "r2");
+		table.put("17", "DIV", "d10");
+		table.put("17", "MINUS", "r2");
+		table.put("17", "MUL", "d9");
+		table.put("17", "PLUS", "r2");
+		table.put("2", "$", "r1");
+		table.put("2", "$GHOST1", "7");
+		table.put("2", "MINUS", "d8");
+		table.put("2", "PLUS", "r10");
+		table.put("3", "$", "r4");
+		table.put("3", "CLOSE", "r4");
+		table.put("3", "DIV", "d10");
+		table.put("3", "MINUS", "r4");
+		table.put("3", "MUL", "d9");
+		table.put("3", "PLUS", "r4");
+		table.put("4", "$", "r7");
+		table.put("4", "CLOSE", "r7");
+		table.put("4", "DIV", "r7");
+		table.put("4", "MINUS", "r7");
+		table.put("4", "MUL", "r7");
+		table.put("4", "PLUS", "r7");
+		table.put("5", "$", "r8");
+		table.put("5", "CLOSE", "r8");
+		table.put("5", "DIV", "r8");
+		table.put("5", "MINUS", "r8");
+		table.put("5", "MUL", "r8");
+		table.put("5", "PLUS", "r8");
+		table.put("6", "E", "11");
+		table.put("6", "F", "4");
+		table.put("6", "OPEN", "d6");
+		table.put("6", "T", "3");
+		table.put("6", "num", "d5");
+		table.put("7", "PLUS", "d12");
+		table.put("8", "F", "4");
+		table.put("8", "OPEN", "d6");
+		table.put("8", "T", "13");
+		table.put("8", "num", "d5");
+		table.put("9", "F", "14");
+		table.put("9", "OPEN", "d6");
+		table.put("9", "num", "d5");
+		grammarLines.add(new GrammarLine("S",new ArrayList<>(Arrays.asList("E"))));
+		grammarLines.add(new GrammarLine("E",new ArrayList<>(Arrays.asList("E", "$GHOST1", "PLUS", "T"))));
 		grammarLines.add(new GrammarLine("E",new ArrayList<>(Arrays.asList("E", "MINUS", "T"))));
-		grammarLines.add(new GrammarLine("E",new ArrayList<>(Arrays.asList("E", "PLUS", "T"))));
-		grammarLines.add(new GrammarLine("T",new ArrayList<>(Arrays.asList("F"))));
-		grammarLines.add(new GrammarLine("T",new ArrayList<>(Arrays.asList("T", "DIV", "F"))));
+		grammarLines.add(new GrammarLine("E",new ArrayList<>(Arrays.asList("T"))));
 		grammarLines.add(new GrammarLine("T",new ArrayList<>(Arrays.asList("T", "MUL", "F"))));
-		grammarLines.add(new GrammarLine("F",new ArrayList<>(Arrays.asList("NUMBER"))));
+		grammarLines.add(new GrammarLine("T",new ArrayList<>(Arrays.asList("T", "DIV", "F"))));
+		grammarLines.add(new GrammarLine("T",new ArrayList<>(Arrays.asList("F"))));
+		grammarLines.add(new GrammarLine("F",new ArrayList<>(Arrays.asList("num"))));
 		grammarLines.add(new GrammarLine("F",new ArrayList<>(Arrays.asList("OPEN", "E", "CLOSE"))));
+		grammarLines.add(new GrammarLine("$GHOST1",new ArrayList<>(Arrays.asList("ɛ"))));
  }
 
     public Object parse() throws ParserException {
@@ -234,67 +206,99 @@ public class parser {
         {
 			case 1:
 			{
+				Integer e;
+				e = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = e; System.out.println(e);
 				stack.push(RESULT);
 				return;
 			}
 			case 2:
 			{
+				Integer e;
+				Integer t;
+				e = (Integer) stack.elementAt(stack.size() - 8);
+				t = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = e + t;
 				stack.push(RESULT);
 				return;
 			}
 			case 3:
 			{
+				Integer e;
+				Integer t;
+				e = (Integer) stack.elementAt(stack.size() - 6);
+				t = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = e - t;
 				stack.push(RESULT);
 				return;
 			}
 			case 4:
 			{
+				Integer t;
+				t = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = t;
 				stack.push(RESULT);
 				return;
 			}
 			case 5:
 			{
+				Integer t;
+				Integer f;
+				t = (Integer) stack.elementAt(stack.size() - 6);
+				f = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = t * f;
 				stack.push(RESULT);
 				return;
 			}
 			case 6:
 			{
+				Integer t;
+				Integer f;
+				t = (Integer) stack.elementAt(stack.size() - 6);
+				f = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = t / f;
 				stack.push(RESULT);
 				return;
 			}
 			case 7:
 			{
+				Integer f;
+				f = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = f;
 				stack.push(RESULT);
 				return;
 			}
 			case 8:
 			{
+				Integer n;
+				n = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
+				RESULT = n;
 				stack.push(RESULT);
 				return;
 			}
 			case 9:
 			{
+				Integer e;
+				e = (Integer) stack.elementAt(stack.size() - 4);
 				PopStack(magnitude);
+				RESULT = e;
 				stack.push(RESULT);
 				return;
 			}
 			case 10:
 			{
+				Integer e;
+				e = (Integer) stack.elementAt(stack.size() - 2);
 				PopStack(magnitude);
-				stack.push(RESULT);
-				return;
-			}
-			case 11:
-			{
-				PopStack(magnitude);
+				System.out.println(e);
 				stack.push(RESULT);
 				return;
 			}

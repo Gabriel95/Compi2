@@ -380,7 +380,7 @@ public class AutomataService {
         {
             for(int j = 0; j < toMinimize.lineCollection.size(); j++)
             {
-                if(i != j && !doNotEvaluate.contains(i))
+                if(i != j && !doNotEvaluate.contains(i) && toMinimize.lineCollection.get(i).Producer.equals(toMinimize.lineCollection.get(j).Producer))
                 {
                     List<String> temp1 = new ArrayList<>(toMinimize.lineCollection.get(i).Production);
                     List<String> temp2 = new ArrayList<>(toMinimize.lineCollection.get(j).Production);

@@ -91,15 +91,18 @@ public class CupLexer {
                           throw new LexerException("Unknown Token: / at line: " + prevLine + " column: " + prevColumn);
                         }
                     }
+                    else
+                    {
+                        throw new LexerException("Unknown Symbol: \"" + currentChar + "\" at line: "+ prevLine + " column: " + prevColumn);
+                    }
                     break;
                 //IDs or Reserved Words
                 case 1:
-                    if(Character.isLetterOrDigit(currentChar) || currentChar == '_')
+                    if(Character.isLetterOrDigit(currentChar) || currentChar == '_' || currentChar == '<' || currentChar == '>')
                     {
                         lexeme += currentChar;
                         increasePointer();
                         currentChar = getCurrentSymbol();
-
                     }
                     else
                     {
@@ -166,6 +169,8 @@ public class CupLexer {
                     lexeme = "";
                     state = 0;
                     break;
+                default:
+                    throw new LexerException("Unknown Symbol: " + currentChar + " at line: " + prevLine + " column: " + prevColumn);
             }
         }
 

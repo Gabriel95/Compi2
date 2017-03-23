@@ -55,22 +55,6 @@ terminal a, b;
 
 S ::= a S b S | a;
 
-non terminal Integer E, T, F;
-non terminal S;
-terminal Integer num;
-terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE,ɛ;
-
-S ::= E:e {:System.out.println(e);:};
-E ::= E:e {:System.out.println(t);:} PLUS T:t {:RESULT = e + t;:}
-     | E:e MINUS T:t {:RESULT = e - t;:}
-     | T : t {:RESULT = t;:};
-T ::= T:t MUL F:f {:RESULT = t * f;:}
-     |T:t DIV F:f {:RESULT = t / f;:}
-     |F:f {:RESULT = f;:};
-F ::= num:n{:RESULT = n;:}
-     |OPEN E:e CLOSE {:RESULT = e;:};
-*/
-
 terminal           SEMI, PLUS, MINUS, MUL, DIV, OPEN, CLOSE,ɛ;
 terminal Integer   NUMBER;
 terminal           EQUALS;
@@ -89,3 +73,20 @@ non terminal E, EQUATION_LIST, EQUATION, T, F;
 
     F ::= NUMBER
         | OPEN E CLOSE;
+*/
+
+non terminal Integer E, T, F;
+non terminal S;
+terminal Integer num;
+terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE,ɛ;
+
+S ::= E:e {:RESULT = E; System.out.println(e);:};
+E ::= E:e {:System.out.println(e);:} PLUS T:t {:RESULT = e + t;:}
+     | E:e MINUS T:t {:RESULT = e - t;:}
+     | T : t {:RESULT = t;:};
+T ::= T:t MUL F:f {:RESULT = t * f;:}
+     |T:t DIV F:f {:RESULT = t / f;:}
+     |F:f {:RESULT = f;:};
+F ::= num:n{:RESULT = n;:}
+     |OPEN E:e CLOSE {:RESULT = e;:};
+
