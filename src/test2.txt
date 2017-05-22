@@ -1,5 +1,3 @@
-import java_cup.runtime.*;
-
 /*
 java -jar jflex-1.6.1.jar lexer
 
@@ -23,21 +21,72 @@ E ::= ɛ;
 
 
 non terminal S,C;
- terminal x,d;
+terminal x,d;
 
 S ::= C C;
 C ::= x C | d;
 
+non terminal E, T;
+terminal PLUS, ID, NUMBER;
+
+E ::=  T PLUS E | T;
+T ::= NUMBER | ID;
+
+non terminal E, T;
+terminal PLUS, ID, OPEN, CLOSE;
+
+E ::=  T PLUS E | T;
+T ::= ID | OPEN E CLOSE;
+
 non terminal S;
 terminal a, b;
+
 S ::= a S b S | a;
 
+non terminal E,T,F;
+terminal STAR, PLUS, OPEN, CLOSE, num;
+
+E ::= T PLUS E | T;
+T ::= F STAR T | F;
+F ::= num | OPEN E CLOSE;
+
+non terminal S;
+terminal a, b;
+
+S ::= a S b S | a;
+
+terminal           SEMI, PLUS, MINUS, MUL, DIV, OPEN, CLOSE,ɛ;
+terminal Integer   NUMBER;
+terminal           EQUALS;
+terminal String    ID;
+non terminal E, EQUATION_LIST, EQUATION, T, F;
+
+    EQUATION_LIST ::= EQUATION EQUATION_LIST  | ɛ;
+
+    EQUATION ::= E EQUALS E SEMI;
+
+    E ::= T | E MINUS T | E PLUS T;
+
+    T ::= F
+        | T DIV F
+        | T MUL F;
+
+    F ::= NUMBER
+        | OPEN E CLOSE;
 */
 
+non terminal Integer E, T, F;
+non terminal S;
+terminal Integer num;
+terminal PLUS,MINUS,MUL,DIV,OPEN,CLOSE,ɛ;
 
-non terminal E, T, F;
-terminal a, b, OPEN, CLOSE, STAR, PLUS, e;
+S ::= E:e {:RESULT = E; System.out.println(e);:};
+E ::= E:e {:System.out.println(e);:} PLUS T:t {:RESULT = e + t;:}
+     | E:e MINUS T:t {:RESULT = e - t;:}
+     | T : t {:RESULT = t;:};
+T ::= T:t MUL F:f {:RESULT = t * f;:}
+     |T:t DIV F:f {:RESULT = t / f;:}
+     |F:f {:RESULT = f;:};
+F ::= num:n{:RESULT = n;:}
+     |OPEN E:e CLOSE {:RESULT = e;:};
 
-E ::=  E PLUS T | T;
-T ::= T F | F;
-F ::= F STAR | OPEN E CLOSE | a | b | e;

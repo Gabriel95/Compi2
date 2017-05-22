@@ -13,4 +13,10 @@ public class DeclarationTypeNode extends IdNode{
     public void EvaluateSemantic() {
         //do nothing
     }
+
+    public String getName(){
+        if(accessor!=null)
+            return this.Name + "." + accessor.getName();
+        return this.Name;
+    }
 }

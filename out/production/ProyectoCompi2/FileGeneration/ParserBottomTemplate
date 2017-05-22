@@ -1,6 +1,6 @@
-}
+ }
 
-    public void parse() throws ParserException {
+    public Object parse() throws ParserException {
         stack.push("0");
         try
         {
@@ -10,21 +10,24 @@
                 if(!table.contains(stack.peek(),sym.terminalNames[s.getType()]))
                     throw new ParserException("Unexpected token at line: " + s.getYyline() + " column: " + s.getYycolumn());
                 String action = table.get(stack.peek(),sym.terminalNames[s.getType()]);
-                doAction(action);
+                doAction(action,s.getValue());
                 if(stack.peek().equals("Accepted"))
-                    break;
+                {
+                    return stack.elementAt(stack.size()-2);
+                }
                 if(next)
                     s = lexer.yylex();
             }
-
+            throw new ParserException("Expected EOF");
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+        throw new ParserException("Expected EOF");
     }
 
-    private void doAction(String action) throws ParserException {
+    private void doAction(String action, Object value) throws ParserException {
         char a = action.charAt(0);
         if(action.equals("Accepted"))
         {
@@ -35,22 +38,38 @@
         switch (a)
         {
             case 'd':
+                stack.push(value);
                 stack.push(action.replace("d",""));
                 next = true;
                 break;
             case 'r':
                 int r = Integer.parseInt(action.replace("r",""));
                 GrammarLine grammarLine = grammarLines.get(r - 1);
-                for(int i = 0; i < grammarLine.Productions.size(); i++)
-                {
-                    stack.pop();
-                }
-                if(!table.contains(stack.peek(),grammarLine.Producer))
+                int magnitude = 0;
+                if(grammarLine.Productions.size() > 1)
+                    magnitude = grammarLine.Productions.size();
+                else if(!grammarLine.Productions.get(0).equals("ɛ"))
+                    magnitude = 1;
+                DoReduction(r, magnitude);
+                if(!table.contains(stack.elementAt(stack.size()-2),grammarLine.Producer))
                     throw new ParserException("Unexpected token");
-                stack.push(table.get(stack.peek(),grammarLine.Producer));
+                stack.push(table.get(stack.elementAt(stack.size()-2),grammarLine.Producer));
                 next = false;
                 break;
 
         }
     }
-}
+
+    private void PopStack(int magnitude)
+    {
+        for(int i = 0; i < magnitude * 2; i++)
+        {
+            stack.pop();
+        }
+    }
+
+    private void DoReduction(int r, int magnitude)
+    {
+        Object RESULT = null;
+        switch (r)
+        {

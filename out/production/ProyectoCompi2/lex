@@ -21,19 +21,26 @@
 LineTerminator = \r|\n|\r\n
 
 WhiteSpace     = {LineTerminator} | [ \t\f]
-
+dec_int_lit = 0 | [1-9][0-9]*
+dec_int_id = [A-Za-z_][A-Za-z_0-9]*
 
 %%
 
 <YYINITIAL> {
 
-    "a"                { return symbol(sym.a, yytext()); }
-    "b"                { return symbol(sym.b, yytext()); }
-
+    {dec_int_lit}      { return symbol(sym.NUMBER,  Integer.parseInt(yytext())); }
+    "+"                { return symbol(sym.PLUS,  yytext()); }
+    "-"                { return symbol(sym.MINUS,  yytext()); }
+    "/"                { return symbol(sym.MINUS,  yytext()); }
+    "("                { return symbol(sym.OPEN,  yytext()); }
+    ")"                { return symbol(sym.CLOSE, yytext()); }
+    "*"                { return symbol(sym.MUL,  yytext()); }
+    ";"                { return symbol(sym.SEMI,  yytext()); }
+    "="                { return symbol(sym.EQUALS,  yytext()); }
     {WhiteSpace}       { /* just skip what was found, do nothing */ }
 
 }
 
 
-[^]                    { throw new Error("Illegal character <"+yytext()+">"); }
+[^]                    { throw new Error("Illegal character <"+yytext()+"> at line: " + yyline + " column: " + yycolumn); }
 <<EOF>>                          { return symbol(sym.EOF); }

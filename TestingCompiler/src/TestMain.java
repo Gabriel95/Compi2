@@ -14,7 +14,8 @@ public class TestMain {
             try
             {
                 parser p = new parser(lex);
-                p.parse();
+                int a = (Integer) p.parse();
+                System.out.println(a);
                 System.out.println("Success!");
             } catch (Exception ex) {
                 Logger.getLogger(TestMain.class.getName()).log(Level.SEVERE, null, ex);

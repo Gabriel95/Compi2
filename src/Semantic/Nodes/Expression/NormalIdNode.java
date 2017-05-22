@@ -8,4 +8,11 @@ import com.google.gson.annotations.SerializedName;
 public class NormalIdNode extends IdNode{
     @SerializedName("accessor")
     public AccessorNode accessor;
+
+    public String getName()
+    {
+        if(accessor!=null)
+            return this.Name + "." + accessor.getName();
+        return this.Name;
+    }
 }

@@ -1,5 +1,7 @@
 package FileGeneration;
 import Automata.GrammarLine;
+import Automata.Label;
+import Semantic.Nodes.Expression.ImportIdNode;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 import com.google.common.collect.RowSortedTable;
@@ -24,11 +26,10 @@ public class FileGenerationService {
         for (Object o : SymbolTable.Instance().variables.entrySet())
         {
             Map.Entry pair = (Map.Entry) o;
-            if(pair.getValue() instanceof Terminal)
+            if(pair.getValue() instanceof Terminal && !pair.getKey().equals("ɛ"))
             {
                 sb.append(variableDeclaration + pair.getKey() + " = " + count + ";\n");
                 count++;
-
             }
         }
         sb.append(terminals);
@@ -36,7 +37,7 @@ public class FileGenerationService {
         for (Object o : SymbolTable.Instance().variables.entrySet())
         {
             Map.Entry pair = (Map.Entry) o;
-            if(pair.getValue() instanceof Terminal)
+            if(pair.getValue() instanceof Terminal && !pair.getKey().equals("ɛ"))
             {
                 sb.append(prefix);
                 prefix = ",\n";
@@ -47,11 +48,15 @@ public class FileGenerationService {
         writeToFile("sym.java",sb.toString());
     }
 
-    public static void generateParser(RowSortedTable<String, String, String> table, List<GrammarLine> grammarLines)
+    public static void generateParser(RowSortedTable<String, String, String> table, List<GrammarLine> grammarLines, List<ImportIdNode> imports)
     {
         String top = "";
         String bottom = "";
         StringBuilder sb = new StringBuilder();
+        for (ImportIdNode importIdNode : imports)
+        {
+            sb.append("import " + importIdNode.getName() + ";\n");
+        }
         try
         {
             File file = new File("src//FileGeneration//ParserTopTemplate");
@@ -100,6 +105,36 @@ public class FileGenerationService {
             sb.append(s);
         }
         sb.append(bottom);
+
+        //Creating Reduction Cases
+        for(int i = 0; i < grammarLines.size(); i++)
+        {
+            String s = "\n\t\t\tcase " + (i + 1) + ":\n\t\t\t{";
+            for (Label lable : grammarLines.get(i).labelList)
+            {
+                s = s + "\n\t\t\t\t" + lable.Type + " " + lable.Name + ";" ;
+            }
+
+            for (Label lable : grammarLines.get(i).labelList)
+            {
+                s = s + "\n\t\t\t\t" + lable.Name + " = ";
+                if(!lable.Type.equals("Object"))
+                {
+                    s = s + "(" + lable.Type + ") ";
+                }
+                s = s + "stack.elementAt(stack.size() - " + (2 * (grammarLines.get(i).Productions.size() - lable.position)) + ");";
+            }
+            s = s + "\n\t\t\t\tPopStack(magnitude);";
+
+            //Traduccion Dirigida Code
+            for(String javaCode : grammarLines.get(i).javaCodeList)
+            {
+                s = s + "\n\t\t\t\t" + javaCode;
+            }
+            s = s + "\n\t\t\t\tstack.push(RESULT);\n\t\t\t\treturn;\n\t\t\t}";
+            sb.append(s);
+        }
+        sb.append("\n\t\t\tdefault:\n\t\t\t\treturn;\n\t\t}\n\t}\n}");
         writeToFile("parser.java",sb.toString());
     }
 

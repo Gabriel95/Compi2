@@ -1,8 +1,8 @@
 package Automata;
 
-import Semantic.Nodes.Expression.ProdPartNode;
-import Semantic.Nodes.Expression.RhsNode;
+import Semantic.Nodes.Expression.*;
 import Semantic.Nodes.Statements.ProductionNode;
+import Semantic.Nodes.Statements.SymbolNode;
 import Semantic.Types.SymbolTable;
 import Semantic.Types.Terminal;
 
@@ -169,7 +169,7 @@ public class GrammarService {
         return followList;
     }
 
-    public static List<GrammarLine> GetNonSimplifiedGrammarTable(List<ProductionNode> productionNodeList)
+    public static List<GrammarLine> GetNonSimplifiedGrammarTable(List<ProductionNode> productionNodeList, Map<String, String> typeTable)
     {
         List<GrammarLine> nonSimplifiedGrammarTable = new ArrayList<>();
         for(ProductionNode productionNode : productionNodeList)
@@ -177,27 +177,69 @@ public class GrammarService {
             for(RhsNode rhsNode : productionNode.RhsTokenList)
             {
                 List<String> toAdd = new ArrayList<>();
-                for(ProdPartNode prodPartNode : rhsNode.prodPartList)
+                List<Label> labelList = new ArrayList<>();
+                List<String> javaCodeList = new ArrayList<>();
+                for(int i = 0; i < rhsNode.prodPartList.size(); i++)
                 {
-                    if(prodPartNode.symbolIdNode != null)
-                        toAdd.add(prodPartNode.symbolIdNode.Name);
+                    if(rhsNode.prodPartList.get(i).symbolIdNode != null)
+                    {
+                        toAdd.add(rhsNode.prodPartList.get(i).symbolIdNode.Name);
+                        if(rhsNode instanceof GhostRhsNode)
+                        {
+                            for(int j = 0; j < ((GhostRhsNode)rhsNode).ghostList.size(); j++)
+                            {
+                                if(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.label != null)
+                                {
+                                    labelList.add(new Label(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.label.Name,
+                                            typeTable.get(((GhostRhsNode)rhsNode).ghostList.get(j).symbolIdNode.Name),j));
+                                }
+                            }
+                        }
+                        else if(rhsNode.prodPartList.get(i).symbolIdNode.label != null)
+                        {
+                            labelList.add(new Label(rhsNode.prodPartList.get(i).symbolIdNode.label.Name,
+                                    typeTable.get(rhsNode.prodPartList.get(i).symbolIdNode.Name),i));
+                        }
+                    }
+                    else
+                    {
+                        javaCodeList.add(rhsNode.prodPartList.get(i).JavaCodeNode.Code);
+                    }
                 }
-                nonSimplifiedGrammarTable.add(new GrammarLine(productionNode.ntID.Name, toAdd));
+                nonSimplifiedGrammarTable.add(new GrammarLine(productionNode.ntID.Name, toAdd,labelList,javaCodeList));
             }
         }
         return nonSimplifiedGrammarTable;
     }
 
-
     public static String GetReduction(NodeLine nodeLine, List<GrammarLine> grammar)
     {
         for(int i = 0; i < grammar.size(); i++)
         {
-            if(nodeLine.Production.equals(grammar.get(i).Productions))
+            if(nodeLine.Production.equals(grammar.get(i).Productions) && grammar.get(i).Producer.equals(nodeLine.Producer))
             {
                 return "r" + (i + 1);
             }
         }
         return null;
+    }
+
+    public static Map<String,String> GetTypeTable(List<SymbolNode> symbolList)
+    {
+        Map<String,String> TypeTable= new HashMap<>();
+        for (SymbolNode symbolNode: symbolList) {
+            for(IdNode idNode : symbolNode.declarationList)
+            {
+                if (symbolNode.className != null)
+                {
+                    TypeTable.put(idNode.Name,symbolNode.className.getName());
+                }
+                else
+                {
+                    TypeTable.put(idNode.Name,"Object");
+                }
+            }
+        }
+        return TypeTable;
     }
 }
